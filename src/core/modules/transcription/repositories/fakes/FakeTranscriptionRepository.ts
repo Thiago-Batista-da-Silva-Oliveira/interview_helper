@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/require-await */
 import { ITranscriptionDTO } from '../../dtos/ITranscriptionDTO';
 import { Transcription } from '../../entities/Transcription';
 import { ITranscritpionRepository } from '../ITranscriptionRepository';
