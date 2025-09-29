@@ -4,7 +4,10 @@ import type { IUserUsageRepository } from '@modules/user/repositories/IUserUsage
 import type { IHashProvider } from '@infra/cryptography/interfaces/IHashProvider';
 import { UserResponseDto } from '@modules/user/dtos/UserResponseDto';
 import { UserUsage } from '@modules/user/entities/UserUsage';
-import { USER_REPOSITORY_TOKEN, USER_USAGE_REPOSITORY_TOKEN } from '@modules/user/repositories/tokens';
+import {
+  USER_REPOSITORY_TOKEN,
+  USER_USAGE_REPOSITORY_TOKEN,
+} from '@modules/user/repositories/tokens';
 import { HASH_PROVIDER_TOKEN } from '@infra/cryptography/interfaces/tokens';
 
 interface RegisterUserRequest {

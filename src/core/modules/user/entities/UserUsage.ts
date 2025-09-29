@@ -48,7 +48,10 @@ export class UserUsage extends Entity<UserUsageProps> {
     this.props.updatedAt = new Date();
   }
 
-  public static create(props: Omit<UserUsageProps, 'createdAt' | 'updatedAt'>, id?: string): UserUsage {
+  public static create(
+    props: Omit<UserUsageProps, 'createdAt' | 'updatedAt'>,
+    id?: string,
+  ): UserUsage {
     const now = new Date();
     return new UserUsage(
       {

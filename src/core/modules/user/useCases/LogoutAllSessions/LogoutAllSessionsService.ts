@@ -21,7 +21,7 @@ export class LogoutAllSessionsService {
     const { userId } = request;
 
     await this.userSessionRepository.deactivateAllByUserId(userId);
-    
+
     // Clear cached user data
     this.cache.del(`user:${userId}`);
   }

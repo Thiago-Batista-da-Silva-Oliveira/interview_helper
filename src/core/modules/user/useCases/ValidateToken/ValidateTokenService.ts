@@ -4,7 +4,10 @@ import type { IUserSessionRepository } from '@modules/user/repositories/IUserSes
 import type { IJwtProvider } from '@infra/cryptography/interfaces/IJwtProvider';
 import type { ICache } from '@infra/cache/interfaces/ICache';
 import { UserResponseDto } from '@modules/user/dtos/UserResponseDto';
-import { USER_REPOSITORY_TOKEN, USER_SESSION_REPOSITORY_TOKEN } from '@modules/user/repositories/tokens';
+import {
+  USER_REPOSITORY_TOKEN,
+  USER_SESSION_REPOSITORY_TOKEN,
+} from '@modules/user/repositories/tokens';
 import { JWT_PROVIDER_TOKEN } from '@infra/cryptography/interfaces/tokens';
 import { CACHE_PROVIDER_TOKEN } from '@infra/cache/interfaces/tokens';
 
@@ -49,7 +52,7 @@ export class ValidateTokenService {
       }
 
       const userResponse = new UserResponseDto(user);
-      
+
       // Cache for 5 minutes
       this.cache.set(`user:${user.id}`, userResponse, 300);
 

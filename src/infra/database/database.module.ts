@@ -1,6 +1,10 @@
 import { Module } from '@nestjs/common';
 import { PrismaModule } from '@infra/database/prisma/prisma.module';
-import { USER_REPOSITORY_TOKEN, USER_SESSION_REPOSITORY_TOKEN, USER_USAGE_REPOSITORY_TOKEN } from '@modules/user/repositories/tokens';
+import {
+  USER_REPOSITORY_TOKEN,
+  USER_SESSION_REPOSITORY_TOKEN,
+  USER_USAGE_REPOSITORY_TOKEN,
+} from '@modules/user/repositories/tokens';
 import { PrismaUserRepository } from '@infra/database/prisma/repositories/PrismaUserRepository';
 import { PrismaUserSessionRepository } from '@infra/database/prisma/repositories/PrismaUserSessionRepository';
 import { PrismaUserUsageRepository } from '@infra/database/prisma/repositories/PrismaUserUsageRepository';
@@ -21,6 +25,10 @@ import { PrismaUserUsageRepository } from '@infra/database/prisma/repositories/P
       useClass: PrismaUserUsageRepository,
     },
   ],
-  exports: [USER_REPOSITORY_TOKEN, USER_SESSION_REPOSITORY_TOKEN, USER_USAGE_REPOSITORY_TOKEN],
+  exports: [
+    USER_REPOSITORY_TOKEN,
+    USER_SESSION_REPOSITORY_TOKEN,
+    USER_USAGE_REPOSITORY_TOKEN,
+  ],
 })
 export class DatabaseModule {}

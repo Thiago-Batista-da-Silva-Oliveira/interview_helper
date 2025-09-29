@@ -45,7 +45,10 @@ export class UserSession extends Entity<UserSessionProps> {
     return this.props.isActive && !this.isExpired();
   }
 
-  public static create(props: Omit<UserSessionProps, 'isActive' | 'createdAt'>, id?: string): UserSession {
+  public static create(
+    props: Omit<UserSessionProps, 'isActive' | 'createdAt'>,
+    id?: string,
+  ): UserSession {
     return new UserSession(
       {
         ...props,

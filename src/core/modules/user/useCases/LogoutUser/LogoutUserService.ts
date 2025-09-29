@@ -23,7 +23,7 @@ export class LogoutUserService {
     const session = await this.userSessionRepository.findByToken(token);
     if (session) {
       await this.userSessionRepository.deactivate(session.id);
-      
+
       // Clear any cached user data
       this.cache.del(`user:${session.userId}`);
       this.cache.del(`session:${token}`);

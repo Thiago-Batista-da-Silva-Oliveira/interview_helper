@@ -4,8 +4,14 @@ import type { IUserSessionRepository } from '@modules/user/repositories/IUserSes
 import type { IHashProvider } from '@infra/cryptography/interfaces/IHashProvider';
 import type { IJwtProvider } from '@infra/cryptography/interfaces/IJwtProvider';
 import { UserResponseDto } from '@modules/user/dtos/UserResponseDto';
-import { USER_REPOSITORY_TOKEN, USER_SESSION_REPOSITORY_TOKEN } from '@modules/user/repositories/tokens';
-import { HASH_PROVIDER_TOKEN, JWT_PROVIDER_TOKEN } from '@infra/cryptography/interfaces/tokens';
+import {
+  USER_REPOSITORY_TOKEN,
+  USER_SESSION_REPOSITORY_TOKEN,
+} from '@modules/user/repositories/tokens';
+import {
+  HASH_PROVIDER_TOKEN,
+  JWT_PROVIDER_TOKEN,
+} from '@infra/cryptography/interfaces/tokens';
 
 interface LoginUserRequest {
   email: string;
@@ -38,7 +44,10 @@ export class LoginUserService {
       throw new UnauthorizedException('Invalid credentials');
     }
 
-    const isPasswordValid = await this.hashProvider.compare(password, user.password);
+    const isPasswordValid = await this.hashProvider.compare(
+      password,
+      user.password,
+    );
     if (!isPasswordValid) {
       throw new UnauthorizedException('Invalid credentials');
     }
