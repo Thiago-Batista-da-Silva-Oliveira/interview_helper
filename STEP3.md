@@ -99,10 +99,10 @@ Todas as rotas têm prefixo `/api`:
 
 ## Tarefas (Camada HTTP)
 
-### 3.1 - DTOs de Validação HTTP
+### 3.1 - DTOs de Validação HTTP ✅
 > DTOs para validar requisições HTTP usando `class-validator`
 
-- [ ] Criar `src/infra/http/dtos/interview/StartInterviewDto.ts`
+- [x] Criar `src/infra/http/dtos/interview/StartInterviewDto.ts`
   ```typescript
   - resumeDescription: string (required, minLength: 50, maxLength: 5000)
   - jobDescription: string (required, minLength: 50, maxLength: 5000)
@@ -110,13 +110,13 @@ Todas as rotas têm prefixo `/api`:
   - Validações: @IsString(), @MinLength(), @MaxLength(), @IsEnum(), @IsNotEmpty()
   ```
 
-- [ ] Criar `src/infra/http/dtos/interview/SendMessageDto.ts`
+- [x] Criar `src/infra/http/dtos/interview/SendMessageDto.ts`
   ```typescript
   - content: string (required, minLength: 1, maxLength: 2000)
   - Validações: @IsString(), @MinLength(), @MaxLength(), @IsNotEmpty()
   ```
 
-- [ ] Criar `src/infra/http/dtos/interview/ListInterviewsQueryDto.ts`
+- [x] Criar `src/infra/http/dtos/interview/ListInterviewsQueryDto.ts`
   ```typescript
   - status: enum InterviewStatus (optional)
   - type: enum InterviewType (optional)
@@ -131,10 +131,10 @@ Todas as rotas têm prefixo `/api`:
 
 ---
 
-### 3.2 - Presenters (Response Formatters)
+### 3.2 - Presenters (Response Formatters) ✅
 > Formatadores para transformar entidades de domínio em responses HTTP
 
-- [ ] Criar `src/infra/http/presenters/interview.presenter.ts`
+- [x] Criar `src/infra/http/presenters/interview.presenter.ts`
   ```typescript
   export class InterviewPresenter {
     static toHTTP(interview: Interview): InterviewResponse
@@ -145,7 +145,7 @@ Todas as rotas têm prefixo `/api`:
   - Estrutura limpa e consistente
   ```
 
-- [ ] Criar `src/infra/http/presenters/message.presenter.ts`
+- [x] Criar `src/infra/http/presenters/message.presenter.ts`
   ```typescript
   export class MessagePresenter {
     static toHTTP(message: Message): MessageResponse
@@ -155,7 +155,7 @@ Todas as rotas têm prefixo `/api`:
   - Formatar datas
   ```
 
-- [ ] Criar `src/infra/http/presenters/pagination.presenter.ts`
+- [x] Criar `src/infra/http/presenters/pagination.presenter.ts`
   ```typescript
   export class PaginationPresenter {
     static toHTTP(data: IListInterviewsResult): PaginationResponse
@@ -165,10 +165,10 @@ Todas as rotas têm prefixo `/api`:
 
 ---
 
-### 3.3 - Exception Filters
+### 3.3 - Exception Filters ✅
 > Interceptar exceções e formatar respostas de erro padronizadas
 
-- [ ] Criar `src/infra/http/filters/http-exception.filter.ts`
+- [x] Criar `src/infra/http/filters/http-exception.filter.ts`
   ```typescript
   @Catch(HttpException)
   export class HttpExceptionFilter implements ExceptionFilter {
@@ -179,7 +179,7 @@ Todas as rotas têm prefixo `/api`:
   - Incluir stack trace apenas em desenvolvimento
   ```
 
-- [ ] Criar `src/infra/http/filters/all-exceptions.filter.ts`
+- [x] Criar `src/infra/http/filters/all-exceptions.filter.ts`
   ```typescript
   @Catch()
   export class AllExceptionsFilter implements ExceptionFilter
@@ -196,7 +196,7 @@ Todas as rotas têm prefixo `/api`:
   - InvalidInterviewStatusException extends BadRequestException
   ```
 
-- [ ] Aplicar filters globalmente no `main.ts`:
+- [x] Aplicar filters globalmente via HttpModule providers (APP_FILTER)
   ```typescript
   app.useGlobalFilters(
     new AllExceptionsFilter(),
@@ -206,10 +206,10 @@ Todas as rotas têm prefixo `/api`:
 
 ---
 
-### 3.4 - Pipes de Transformação
+### 3.4 - Pipes de Transformação ✅
 > Pipes para validar e transformar dados de entrada
 
-- [ ] Criar `src/infra/http/pipes/parse-uuid.pipe.ts`
+- [x] Criar `src/infra/http/pipes/parse-uuid.pipe.ts`
   ```typescript
   @Injectable()
   export class ParseUUIDPipe implements PipeTransform
@@ -218,7 +218,7 @@ Todas as rotas têm prefixo `/api`:
   - Retornar UUID validado
   ```
 
-- [ ] Configurar ValidationPipe global no `main.ts`:
+- [x] Configurar ValidationPipe global no `main.ts`:
   ```typescript
   app.useGlobalPipes(
     new ValidationPipe({
@@ -231,10 +231,10 @@ Todas as rotas têm prefixo `/api`:
 
 ---
 
-### 3.5 - Interceptors
+### 3.5 - Interceptors ✅
 > Interceptors para transformar responses e adicionar logging
 
-- [ ] Criar `src/infra/http/interceptors/transform-response.interceptor.ts`
+- [x] Criar `src/infra/http/interceptors/transform-response.interceptor.ts`
   ```typescript
   @Injectable()
   export class TransformResponseInterceptor implements NestInterceptor
@@ -247,7 +247,7 @@ Todas as rotas têm prefixo `/api`:
   - Aplicar a todas as respostas
   ```
 
-- [ ] Criar `src/infra/http/interceptors/logging.interceptor.ts`
+- [x] Criar `src/infra/http/interceptors/logging.interceptor.ts`
   ```typescript
   @Injectable()
   export class LoggingInterceptor implements NestInterceptor
@@ -256,7 +256,7 @@ Todas as rotas têm prefixo `/api`:
   - Incluir request ID (se disponível)
   ```
 
-- [ ] Aplicar interceptors globalmente no `main.ts`:
+- [x] Aplicar interceptors globalmente via HttpModule providers (APP_INTERCEPTOR)
   ```typescript
   app.useGlobalInterceptors(
     new LoggingInterceptor(),
@@ -266,10 +266,10 @@ Todas as rotas têm prefixo `/api`:
 
 ---
 
-### 3.6 - Middlewares HTTP
+### 3.6 - Middlewares HTTP ✅
 > Middlewares para validações específicas antes dos controllers
 
-- [ ] Criar `src/infra/http/middlewares/check-interview-owner.middleware.ts`
+- [x] Criar `src/infra/http/middlewares/check-interview-owner.middleware.ts`
   ```typescript
   @Injectable()
   export class CheckInterviewOwnerMiddleware implements NestMiddleware
@@ -280,7 +280,7 @@ Todas as rotas têm prefixo `/api`:
   - Anexar interview ao request (req.interview) para otimização
   ```
 
-- [ ] Aplicar middleware nas rotas específicas:
+- [x] Aplicar middleware nas rotas específicas via HttpModule.configure():
   ```typescript
   // No InterviewModule
   configure(consumer: MiddlewareConsumer) {
@@ -299,10 +299,10 @@ Todas as rotas têm prefixo `/api`:
 
 ---
 
-### 3.7 - Interview Controller
+### 3.7 - Interview Controller ✅
 > Controller REST para gerenciar entrevistas
 
-- [ ] Criar `src/infra/http/controllers/interview.controller.ts`
+- [x] Criar `src/infra/http/controllers/interview.controller.ts`
 
 **Configuração base:**
 ```typescript
@@ -323,7 +323,7 @@ export class InterviewController {
 
 **Rotas a implementar:**
 
-- [ ] **POST /interviews** - Iniciar nova entrevista
+- [x] **POST /interviews** - Iniciar nova entrevista
   ```typescript
   @Post()
   @HttpCode(HttpStatus.CREATED)
@@ -337,7 +337,7 @@ export class InterviewController {
   - Retornar { interview, firstMessage }
   ```
 
-- [ ] **POST /interviews/:id/messages** - Enviar mensagem
+- [x] **POST /interviews/:id/messages** - Enviar mensagem
   ```typescript
   @Post(':id/messages')
   @HttpCode(HttpStatus.CREATED)
@@ -352,7 +352,7 @@ export class InterviewController {
   - Retornar { userMessage, assistantMessage }
   ```
 
-- [ ] **POST /interviews/:id/complete** - Finalizar entrevista
+- [x] **POST /interviews/:id/complete** - Finalizar entrevista
   ```typescript
   @Post(':id/complete')
   async complete(
@@ -365,7 +365,7 @@ export class InterviewController {
   - Retornar interview com feedback, insights e score
   ```
 
-- [ ] **GET /interviews/:id** - Buscar entrevista específica
+- [x] **GET /interviews/:id** - Buscar entrevista específica
   ```typescript
   @Get(':id')
   async findOne(
@@ -378,7 +378,7 @@ export class InterviewController {
   - Retornar { interview, messages }
   ```
 
-- [ ] **GET /interviews** - Listar entrevistas do usuário
+- [x] **GET /interviews** - Listar entrevistas do usuário
   ```typescript
   @Get()
   async findAll(
@@ -391,7 +391,7 @@ export class InterviewController {
   - Retornar { interviews, metadata }
   ```
 
-- [ ] **PATCH /interviews/:id/cancel** - Cancelar entrevista
+- [x] **PATCH /interviews/:id/cancel** - Cancelar entrevista
   ```typescript
   @Patch(':id/cancel')
   async cancel(
@@ -406,10 +406,10 @@ export class InterviewController {
 
 ---
 
-### 3.8 - Health Check Controller
+### 3.8 - Health Check Controller ✅
 > Controller para monitoramento de saúde da aplicação
 
-- [ ] Criar `src/infra/http/controllers/health.controller.ts`
+- [x] Criar `src/infra/http/controllers/health.controller.ts`
   ```typescript
   @Controller('health')
   @Public() // Decorator para permitir acesso sem autenticação
@@ -419,7 +419,7 @@ export class InterviewController {
   }
   ```
 
-- [ ] Implementar health checks:
+- [x] Implementar health checks:
   ```typescript
   - Verificar conexão com banco (Prisma.$queryRaw)
   - Verificar disponibilidade da API de IA (opcional)
@@ -428,10 +428,10 @@ export class InterviewController {
 
 ---
 
-### 3.9 - Atualizar HTTP Module
+### 3.9 - Atualizar HTTP Module ✅
 > Registrar controllers e providers no HttpModule
 
-- [ ] Atualizar `src/infra/http/http.module.ts`:
+- [x] Atualizar `src/infra/http/http.module.ts`:
   ```typescript
   @Module({
     imports: [UserModule, InterviewModule],
@@ -618,10 +618,10 @@ beforeEach(async () => {
 
 ---
 
-### 3.13 - Configuração do Main.ts
+### 3.13 - Configuração do Main.ts ✅
 > Configurar aplicação com todos os pipes, filters e interceptors
 
-- [ ] Atualizar `src/main.ts`:
+- [x] Atualizar `src/main.ts`:
   ```typescript
   async function bootstrap() {
     const app = await NestFactory.create(AppModule);
@@ -659,35 +659,35 @@ beforeEach(async () => {
 ## Checklist Final
 
 **DTOs e Validação:**
-- [ ] DTOs HTTP criados (Start, SendMessage, List)
-- [ ] Validações com class-validator configuradas
-- [ ] ValidationPipe global configurado
+- [x] DTOs HTTP criados (Start, SendMessage, List)
+- [x] Validações com class-validator configuradas
+- [x] ValidationPipe global configurado
 
 **Formatação de Respostas:**
-- [ ] Presenters criados (Interview, Message, Pagination)
-- [ ] TransformResponseInterceptor implementado
-- [ ] Formato padronizado: { success, data, timestamp }
+- [x] Presenters criados (Interview, Message, Pagination)
+- [x] TransformResponseInterceptor implementado
+- [x] Formato padronizado: { success, data, timestamp }
 
 **Error Handling:**
-- [ ] HttpExceptionFilter implementado
-- [ ] AllExceptionsFilter implementado
-- [ ] Exceções customizadas criadas (se necessário)
-- [ ] Filters aplicados globalmente
+- [x] HttpExceptionFilter implementado
+- [x] AllExceptionsFilter implementado
+- [ ] Exceções customizadas criadas (não necessário por enquanto)
+- [x] Filters aplicados globalmente
 
 **Controllers:**
-- [ ] InterviewController com 6 rotas implementado
-- [ ] HealthController implementado
-- [ ] Todos os use cases integrados
+- [x] InterviewController com 6 rotas implementado
+- [x] HealthController implementado
+- [x] Todos os use cases integrados
 
 **Middlewares e Guards:**
-- [ ] CheckInterviewOwnerMiddleware implementado
-- [ ] JwtAuthGuard aplicado globalmente
-- [ ] @Public() decorator funcionando
+- [x] CheckInterviewOwnerMiddleware implementado
+- [x] JwtAuthGuard aplicado globalmente (já estava desde STEP1)
+- [x] @Public() decorator funcionando (já estava desde STEP1)
 
 **Pipes e Interceptors:**
-- [ ] ParseUUIDPipe implementado
-- [ ] LoggingInterceptor implementado
-- [ ] Interceptors aplicados globalmente
+- [x] ParseUUIDPipe implementado
+- [x] LoggingInterceptor implementado
+- [x] Interceptors aplicados globalmente
 
 **Testes:**
 - [ ] Testes E2E para todas as rotas
@@ -702,8 +702,8 @@ beforeEach(async () => {
 
 **Extras:**
 - [ ] Rate limiting configurado (opcional)
-- [ ] Health check funcionando
-- [ ] Logs estruturados
+- [x] Health check funcionando
+- [x] Logs estruturados
 
 ---
 
