@@ -1,10 +1,16 @@
 import { Injectable, Inject } from '@nestjs/common';
 import type { IInterviewRepository } from '@modules/interview/repositories/IInterviewRepository';
 import type { IMessageRepository } from '@modules/interview/repositories/IMessageRepository';
-import { INTERVIEW_REPOSITORY, MESSAGE_REPOSITORY } from '@modules/interview/repositories/tokens';
+import {
+  INTERVIEW_REPOSITORY,
+  MESSAGE_REPOSITORY,
+} from '@modules/interview/repositories/tokens';
 import { Interview } from '@modules/interview/entities/Interview';
 import { Message } from '@modules/interview/entities/Message';
-import { InterviewStatus, InterviewType } from '@modules/interview/dtos/IInterviewDTO';
+import {
+  InterviewStatus,
+  InterviewType,
+} from '@modules/interview/dtos/IInterviewDTO';
 import { MessageRole } from '@modules/interview/dtos/IMessageDTO';
 import type { IAIProvider } from '@infra/ai/interfaces/IAIProvider';
 import { AI_PROVIDER } from '@infra/ai/interfaces/tokens';
@@ -38,7 +44,9 @@ export class StartInterviewService {
     private incrementUserUsageService: IncrementUserUsageService,
   ) {}
 
-  async execute(request: IStartInterviewRequest): Promise<IStartInterviewResponse> {
+  async execute(
+    request: IStartInterviewRequest,
+  ): Promise<IStartInterviewResponse> {
     const { userId, resumeDescription, jobDescription, type } = request;
 
     // Validate user has credits
@@ -65,7 +73,10 @@ export class StartInterviewService {
     await this.interviewRepository.update(interview);
 
     // Generate first message from AI
-    const startPrompt = buildInterviewStartPrompt(resumeDescription, jobDescription);
+    const startPrompt = buildInterviewStartPrompt(
+      resumeDescription,
+      jobDescription,
+    );
 
     const aiResponse = await this.aiProvider.sendMessage([
       {

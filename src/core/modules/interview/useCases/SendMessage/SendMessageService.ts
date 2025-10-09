@@ -1,7 +1,16 @@
-import { Injectable, Inject, NotFoundException, ForbiddenException, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  Inject,
+  NotFoundException,
+  ForbiddenException,
+  BadRequestException,
+} from '@nestjs/common';
 import type { IInterviewRepository } from '@modules/interview/repositories/IInterviewRepository';
 import type { IMessageRepository } from '@modules/interview/repositories/IMessageRepository';
-import { INTERVIEW_REPOSITORY, MESSAGE_REPOSITORY } from '@modules/interview/repositories/tokens';
+import {
+  INTERVIEW_REPOSITORY,
+  MESSAGE_REPOSITORY,
+} from '@modules/interview/repositories/tokens';
 import { Message } from '@modules/interview/entities/Message';
 import { MessageRole } from '@modules/interview/dtos/IMessageDTO';
 import type { IAIProvider } from '@infra/ai/interfaces/IAIProvider';
@@ -43,12 +52,16 @@ export class SendMessageService {
 
     // Validate ownership
     if (!interview.belongsTo(userId)) {
-      throw new ForbiddenException('You do not have permission to access this interview');
+      throw new ForbiddenException(
+        'You do not have permission to access this interview',
+      );
     }
 
     // Validate interview is in progress
     if (!interview.isInProgress()) {
-      throw new BadRequestException('Interview is not in progress. Cannot send messages.');
+      throw new BadRequestException(
+        'Interview is not in progress. Cannot send messages.',
+      );
     }
 
     // Save user message
@@ -62,7 +75,8 @@ export class SendMessageService {
     await this.messageRepository.create(userMessage);
 
     // Get conversation history
-    const messageHistory = await this.messageRepository.findByInterviewId(interviewId);
+    const messageHistory =
+      await this.messageRepository.findByInterviewId(interviewId);
 
     // Build AI messages array
     const aiMessages: IAIMessage[] = [

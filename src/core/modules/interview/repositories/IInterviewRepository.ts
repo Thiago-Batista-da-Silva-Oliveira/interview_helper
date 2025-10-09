@@ -21,7 +21,10 @@ export interface IListInterviewsResult {
 export interface IInterviewRepository {
   create(interview: Interview): Promise<void>;
   findById(id: string): Promise<Interview | null>;
-  findByUserId(userId: string, filters?: IListInterviewsFilters): Promise<IListInterviewsResult>;
+  findByUserId(
+    userId: string,
+    filters?: IListInterviewsFilters,
+  ): Promise<IListInterviewsResult>;
   update(interview: Interview): Promise<void>;
   delete(id: string): Promise<void>;
 }

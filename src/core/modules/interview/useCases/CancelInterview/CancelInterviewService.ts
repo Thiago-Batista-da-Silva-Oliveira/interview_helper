@@ -1,4 +1,9 @@
-import { Injectable, Inject, NotFoundException, ForbiddenException } from '@nestjs/common';
+import {
+  Injectable,
+  Inject,
+  NotFoundException,
+  ForbiddenException,
+} from '@nestjs/common';
 import type { IInterviewRepository } from '@modules/interview/repositories/IInterviewRepository';
 import { INTERVIEW_REPOSITORY } from '@modules/interview/repositories/tokens';
 import { Interview } from '@modules/interview/entities/Interview';
@@ -19,7 +24,9 @@ export class CancelInterviewService {
     private interviewRepository: IInterviewRepository,
   ) {}
 
-  async execute(request: ICancelInterviewRequest): Promise<ICancelInterviewResponse> {
+  async execute(
+    request: ICancelInterviewRequest,
+  ): Promise<ICancelInterviewResponse> {
     const { userId, interviewId } = request;
 
     // Validate interview exists
@@ -30,7 +37,9 @@ export class CancelInterviewService {
 
     // Validate ownership
     if (!interview.belongsTo(userId)) {
-      throw new ForbiddenException('You do not have permission to access this interview');
+      throw new ForbiddenException(
+        'You do not have permission to access this interview',
+      );
     }
 
     // Cancel interview

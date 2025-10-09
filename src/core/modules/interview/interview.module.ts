@@ -4,7 +4,10 @@ import { AIModule } from '@infra/ai/ai.module';
 import { UserModule } from '@modules/user/user.module';
 import { PrismaInterviewRepository } from '@infra/database/prisma/repositories/PrismaInterviewRepository';
 import { PrismaMessageRepository } from '@infra/database/prisma/repositories/PrismaMessageRepository';
-import { INTERVIEW_REPOSITORY, MESSAGE_REPOSITORY } from './repositories/tokens';
+import {
+  INTERVIEW_REPOSITORY,
+  MESSAGE_REPOSITORY,
+} from './repositories/tokens';
 
 // Use Cases
 import { StartInterviewService } from './useCases/StartInterview/StartInterviewService';

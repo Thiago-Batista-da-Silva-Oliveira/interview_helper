@@ -60,7 +60,7 @@ export class CheckUserUsageService {
   }
 
   private getCurrentUsage(
-    usage: any | null,
+    usage: { textInterviewsUsed: number; audioInterviewsUsed: number } | null,
     interviewType: InterviewType,
   ): number {
     if (!usage) {

@@ -1,7 +1,15 @@
-import { Injectable, Inject, NotFoundException, ForbiddenException } from '@nestjs/common';
+import {
+  Injectable,
+  Inject,
+  NotFoundException,
+  ForbiddenException,
+} from '@nestjs/common';
 import type { IInterviewRepository } from '@modules/interview/repositories/IInterviewRepository';
 import type { IMessageRepository } from '@modules/interview/repositories/IMessageRepository';
-import { INTERVIEW_REPOSITORY, MESSAGE_REPOSITORY } from '@modules/interview/repositories/tokens';
+import {
+  INTERVIEW_REPOSITORY,
+  MESSAGE_REPOSITORY,
+} from '@modules/interview/repositories/tokens';
 import { Interview } from '@modules/interview/entities/Interview';
 import { Message } from '@modules/interview/entities/Message';
 
@@ -24,7 +32,9 @@ export class GetInterviewHistoryService {
     private messageRepository: IMessageRepository,
   ) {}
 
-  async execute(request: IGetInterviewHistoryRequest): Promise<IGetInterviewHistoryResponse> {
+  async execute(
+    request: IGetInterviewHistoryRequest,
+  ): Promise<IGetInterviewHistoryResponse> {
     const { userId, interviewId } = request;
 
     // Validate interview exists
@@ -35,11 +45,14 @@ export class GetInterviewHistoryService {
 
     // Validate ownership
     if (!interview.belongsTo(userId)) {
-      throw new ForbiddenException('You do not have permission to access this interview');
+      throw new ForbiddenException(
+        'You do not have permission to access this interview',
+      );
     }
 
     // Get all messages
-    const messages = await this.messageRepository.findByInterviewId(interviewId);
+    const messages =
+      await this.messageRepository.findByInterviewId(interviewId);
 
     return {
       interview,

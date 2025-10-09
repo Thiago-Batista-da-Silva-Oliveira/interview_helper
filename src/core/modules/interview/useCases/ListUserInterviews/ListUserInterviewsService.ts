@@ -1,7 +1,14 @@
 import { Injectable, Inject } from '@nestjs/common';
-import type { IInterviewRepository, IListInterviewsFilters, IListInterviewsResult } from '@modules/interview/repositories/IInterviewRepository';
+import type {
+  IInterviewRepository,
+  IListInterviewsFilters,
+  IListInterviewsResult,
+} from '@modules/interview/repositories/IInterviewRepository';
 import { INTERVIEW_REPOSITORY } from '@modules/interview/repositories/tokens';
-import { InterviewStatus, InterviewType } from '@modules/interview/dtos/IInterviewDTO';
+import {
+  InterviewStatus,
+  InterviewType,
+} from '@modules/interview/dtos/IInterviewDTO';
 
 interface IListUserInterviewsRequest {
   userId: string;
@@ -20,7 +27,9 @@ export class ListUserInterviewsService {
     private interviewRepository: IInterviewRepository,
   ) {}
 
-  async execute(request: IListUserInterviewsRequest): Promise<IListInterviewsResult> {
+  async execute(
+    request: IListUserInterviewsRequest,
+  ): Promise<IListInterviewsResult> {
     const { userId, status, type, page, limit, sortBy, sortOrder } = request;
 
     const filters: IListInterviewsFilters = {
