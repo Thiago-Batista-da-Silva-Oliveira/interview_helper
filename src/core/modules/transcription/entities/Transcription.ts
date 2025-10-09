@@ -10,10 +10,6 @@ export class Transcription extends AgregateRoot<ITranscriptionDTO> {
     return this.props.text;
   }
 
-  get id() {
-    return this.props.id;
-  }
-
   get userId() {
     return this.props.userId;
   }

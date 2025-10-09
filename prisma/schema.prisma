@@ -24,8 +24,9 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  sessions UserSession[]
-  usage    UserUsage[]
+  sessions   UserSession[]
+  usage      UserUsage[]
+  interviews Interview[]
 
   @@map("users")
 }
@@ -56,4 +57,56 @@ model UserUsage {
 
   @@unique([userId, month])
   @@map("user_usage")
+}
+
+enum InterviewType {
+  TEXT
+  AUDIO
+}
+
+enum InterviewStatus {
+  PENDING
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
+model Interview {
+  id                String          @id @default(cuid())
+  userId            String
+  type              InterviewType   @default(TEXT)
+  status            InterviewStatus @default(PENDING)
+  resumeDescription String
+  jobDescription    String
+  feedback          String?
+  insights          String?
+  score             Int?
+  startedAt         DateTime?
+  completedAt       DateTime?
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+
+  user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  messages Message[]
+
+  @@map("interviews")
+}
+
+enum MessageRole {
+  USER
+  ASSISTANT
+  SYSTEM
+}
+
+model Message {
+  id          String      @id @default(cuid())
+  interviewId String
+  role        MessageRole
+  content     String
+  metadata    String?     // JSON string
+  createdAt   DateTime    @default(now())
+
+  interview Interview @relation(fields: [interviewId], references: [id], onDelete: Cascade)
+
+  @@map("messages")
 }

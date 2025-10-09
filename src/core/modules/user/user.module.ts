@@ -7,6 +7,8 @@ import { LoginUserService } from '@modules/user/useCases/LoginUser/LoginUserServ
 import { LogoutUserService } from '@modules/user/useCases/LogoutUser/LogoutUserService';
 import { LogoutAllSessionsService } from '@modules/user/useCases/LogoutAllSessions/LogoutAllSessionsService';
 import { ValidateTokenService } from '@modules/user/useCases/ValidateToken/ValidateTokenService';
+import { CheckUserUsageService } from '@modules/user/useCases/CheckUserUsage/CheckUserUsageService';
+import { IncrementUserUsageService } from '@modules/user/useCases/IncrementUserUsage/IncrementUserUsageService';
 
 @Module({
   imports: [CryptographyModule, CacheModule, DatabaseModule],
@@ -16,6 +18,8 @@ import { ValidateTokenService } from '@modules/user/useCases/ValidateToken/Valid
     LogoutUserService,
     LogoutAllSessionsService,
     ValidateTokenService,
+    CheckUserUsageService,
+    IncrementUserUsageService,
   ],
   exports: [
     RegisterUserService,
@@ -23,6 +27,8 @@ import { ValidateTokenService } from '@modules/user/useCases/ValidateToken/Valid
     LogoutUserService,
     LogoutAllSessionsService,
     ValidateTokenService,
+    CheckUserUsageService,
+    IncrementUserUsageService,
   ],
 })
 export class UserModule {}
