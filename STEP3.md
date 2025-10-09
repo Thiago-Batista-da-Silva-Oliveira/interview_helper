@@ -1,385 +1,768 @@
-# STEP 3 - Implementação da Entrevista por Texto
+# STEP 3 - Camada HTTP para Entrevistas
 
 ## Objetivo
-Implementar a interface HTTP completa para entrevistas por texto, incluindo controllers, validações, middlewares e testes E2E.
+Implementar a **camada de apresentação HTTP** para expor os use cases de entrevistas através de uma API REST completa, com validações, middlewares, exception handling e testes E2E.
+
+> **NOTA IMPORTANTE:** A lógica de negócio (use cases, entidades, repositórios, IA) já foi implementada no STEP2. Este step foca **exclusivamente na camada HTTP/REST**.
 
 ---
 
-## Tarefas
+## ✅ Já Implementado no STEP2
 
-### 3.1 - Implementar DTOs de Validação
-- [ ] Criar `src/infra/http/dtos/StartInterviewDto.ts`
-  - resumeDescription (string, required, minLength: 50, maxLength: 5000)
-  - jobDescription (string, required, minLength: 50, maxLength: 5000)
-  - type (enum: TEXT, default: TEXT)
-  - Validar formato e conteúdo
+**Lógica de Negócio (Domain + Application Layer):**
+- ✅ 6 Use Cases (Start, SendMessage, Complete, GetHistory, List, Cancel)
+- ✅ 2 Use Cases de controle de uso (CheckUserUsage, IncrementUserUsage)
+- ✅ Entidades (Interview, Message)
+- ✅ Repositórios (PrismaInterviewRepository, PrismaMessageRepository)
+- ✅ Provider de IA (OpenAIProvider)
+- ✅ Prompts do sistema
+- ✅ Validações de negócio (ownership, status, créditos)
 
-- [ ] Criar `src/infra/http/dtos/SendMessageDto.ts`
-  - content (string, required, minLength: 1, maxLength: 2000)
-  - Validar caracteres especiais permitidos
+---
 
-- [ ] Criar `src/infra/http/dtos/ListInterviewsQueryDto.ts`
-  - status (enum: PENDING, IN_PROGRESS, COMPLETED, CANCELLED, optional)
-  - type (enum: TEXT, AUDIO, optional)
-  - page (number, optional, default: 1, min: 1)
-  - limit (number, optional, default: 10, min: 1, max: 50)
-  - sortBy (string, optional, default: 'createdAt')
-  - sortOrder (enum: ASC, DESC, optional, default: DESC)
+## ✅ STATUS: PARCIALMENTE CONCLUÍDO
+**Data de Conclusão Parcial:** 2025-10-09
+**Build Status:** ✅ Passou (0 erros)
+**Lint Status:** ✅ 52 warnings não-críticos
 
-- [ ] Criar `src/infra/http/dtos/InterviewResponseDto.ts`
-  - Estrutura de resposta padronizada para interviews
+### 📊 Implementado Neste STEP (17 arquivos criados)
 
-### 3.2 - Implementar Controller de Entrevistas
-- [ ] Criar `src/infra/http/controllers/interview.controller.ts`
-  - Configurar rota base `/interviews`
-  - Aplicar guard de autenticação em todas as rotas
-  - Aplicar validation pipe global
+**DTOs de Validação (3 arquivos):**
+- ✅ StartInterviewDto.ts (resumeDescription, jobDescription, type)
+- ✅ SendMessageDto.ts (content)
+- ✅ ListInterviewsQueryDto.ts (status, type, pagination, sorting)
 
-- [ ] **POST /interviews** - Iniciar nova entrevista
-  - Receber StartInterviewDto no body
-  - Validar créditos disponíveis
-  - Chamar StartInterviewService
-  - Retornar interview criada + primeira mensagem da IA
-  - Status: 201 Created
+**Presenters (3 arquivos):**
+- ✅ InterviewPresenter (toHTTP, toHTTPList)
+- ✅ MessagePresenter (toHTTP, toHTTPList)
+- ✅ PaginationPresenter (toHTTP com metadata)
 
-- [ ] **POST /interviews/:id/messages** - Enviar mensagem
-  - Receber SendMessageDto no body
-  - Validar UUID do interviewId
-  - Chamar SendMessageService
-  - Retornar mensagem do usuário + resposta da IA
-  - Status: 201 Created
+**Exception Filters (2 arquivos):**
+- ✅ HttpExceptionFilter (captura HttpExceptions, formata respostas)
+- ✅ AllExceptionsFilter (captura erros não tratados, 500)
 
-- [ ] **POST /interviews/:id/complete** - Finalizar entrevista
-  - Validar UUID do interviewId
-  - Chamar CompleteInterviewService
-  - Retornar interview completa com feedback e insights
-  - Status: 200 OK
+**Pipes (1 arquivo):**
+- ✅ ParseUUIDPipe (validação de UUID)
 
-- [ ] **GET /interviews/:id** - Buscar entrevista específica
-  - Validar UUID do interviewId
-  - Chamar GetInterviewHistoryService
-  - Retornar interview com todas as mensagens
-  - Status: 200 OK
+**Interceptors (2 arquivos):**
+- ✅ TransformResponseInterceptor (padroniza formato { success, data, timestamp })
+- ✅ LoggingInterceptor (registra método, URL, userId, tempo de execução)
 
-- [ ] **GET /interviews** - Listar entrevistas do usuário
-  - Receber ListInterviewsQueryDto como query params
-  - Chamar ListUserInterviewsService
-  - Retornar lista paginada de interviews
-  - Incluir metadata de paginação (total, pages, current)
-  - Status: 200 OK
+**Middlewares (1 arquivo):**
+- ✅ CheckInterviewOwnerMiddleware (valida ownership, otimiza req.interview)
 
-- [ ] **PATCH /interviews/:id/cancel** - Cancelar entrevista
-  - Validar UUID do interviewId
-  - Chamar CancelInterviewService
-  - Retornar interview atualizada
-  - Status: 200 OK
+**Controllers (2 arquivos):**
+- ✅ InterviewController (6 rotas REST completas)
+- ✅ HealthController (GET /health com check de database)
 
-### 3.3 - Implementar Middlewares de Validação
-- [ ] Criar `src/infra/http/middlewares/check-interview-credits.middleware.ts`
-  - Verificar se usuário tem créditos disponíveis (FREE: 1, PREMIUM: 20)
-  - Buscar usage do mês atual
-  - Lançar ForbiddenException se não tiver créditos
-  - Passar para próximo middleware se tiver créditos
+**Configuração (2 arquivos):**
+- ✅ HttpModule atualizado (controllers, filters, interceptors via APP_* providers)
+- ✅ Main.ts configurado (global prefix 'api', ValidationPipe, CORS)
 
-- [ ] Criar `src/infra/http/middlewares/check-interview-owner.middleware.ts`
-  - Verificar se interview pertence ao usuário autenticado
-  - Lançar ForbiddenException se não for o dono
-  - Passar interviewId adiante
+**Dependências Instaladas:**
+- ✅ `uuid` + `@types/uuid` para validação de UUID
 
-- [ ] Aplicar middlewares nas rotas correspondentes
-  - check-interview-credits em POST /interviews
-  - check-interview-owner em rotas específicas de interview
+### 🎯 Rotas Disponíveis
 
-### 3.4 - Implementar Exception Filters
-- [ ] Criar `src/infra/http/filters/http-exception.filter.ts`
-  - Capturar exceções HTTP
-  - Formatar resposta de erro padronizada
-  - Incluir timestamp, path, message, statusCode
+Todas as rotas têm prefixo `/api`:
 
-- [ ] Criar exceções customizadas:
-  - `InterviewNotFoundException`
-  - `InterviewAlreadyCompletedException`
-  - `InsufficientCreditsException`
-  - `InvalidInterviewStatusException`
+1. **POST /api/interviews** - Criar nova entrevista
+2. **POST /api/interviews/:id/messages** - Enviar mensagem
+3. **POST /api/interviews/:id/complete** - Finalizar entrevista
+4. **GET /api/interviews/:id** - Buscar entrevista com histórico
+5. **GET /api/interviews** - Listar entrevistas (com filtros e paginação)
+6. **PATCH /api/interviews/:id/cancel** - Cancelar entrevista
+7. **GET /api/health** - Health check (público, sem autenticação)
 
-### 3.5 - Implementar Pipes de Transformação
-- [ ] Criar `src/infra/http/pipes/parse-uuid.pipe.ts`
-  - Validar formato UUID em params
-  - Lançar BadRequestException se inválido
+### 🔒 Segurança e Validação
 
-- [ ] Aplicar ParseUUIDPipe em rotas com :id
+- ✅ JWT Auth Guard aplicado globalmente
+- ✅ @Public() decorator para rotas públicas (health)
+- ✅ ValidationPipe global (whitelist, forbidNonWhitelisted, transform)
+- ✅ CheckInterviewOwnerMiddleware nas rotas sensíveis
+- ✅ ParseUUIDPipe para validação de IDs
+- ✅ Exception filters para respostas de erro padronizadas
 
-### 3.6 - Implementar Interceptors
-- [ ] Criar `src/infra/http/interceptors/transform-response.interceptor.ts`
-  - Padronizar formato de resposta de sucesso
-  - Estrutura: { success: true, data: {...}, timestamp: ... }
+### 📝 Pendente
 
-- [ ] Criar `src/infra/http/interceptors/logging.interceptor.ts`
-  - Logar requests e responses
-  - Incluir tempo de execução
-  - Logar erros com stack trace
+**Testes E2E (prioritário):**
+- [ ] Criar test/interview.e2e-spec.ts
+- [ ] Testar todas as 7 rotas (happy paths + error cases)
+- [ ] Validar autenticação, ownership, validações
 
-### 3.7 - Criar Serviços de Formatação de Resposta
+**Opcional:**
+- [ ] Rate limiting (ThrottlerModule)
+- [ ] Swagger documentation
+- [ ] Postman collection
+
+---
+
+## Tarefas (Camada HTTP)
+
+### 3.1 - DTOs de Validação HTTP
+> DTOs para validar requisições HTTP usando `class-validator`
+
+- [ ] Criar `src/infra/http/dtos/interview/StartInterviewDto.ts`
+  ```typescript
+  - resumeDescription: string (required, minLength: 50, maxLength: 5000)
+  - jobDescription: string (required, minLength: 50, maxLength: 5000)
+  - type: enum InterviewType (optional, default: TEXT)
+  - Validações: @IsString(), @MinLength(), @MaxLength(), @IsEnum(), @IsNotEmpty()
+  ```
+
+- [ ] Criar `src/infra/http/dtos/interview/SendMessageDto.ts`
+  ```typescript
+  - content: string (required, minLength: 1, maxLength: 2000)
+  - Validações: @IsString(), @MinLength(), @MaxLength(), @IsNotEmpty()
+  ```
+
+- [ ] Criar `src/infra/http/dtos/interview/ListInterviewsQueryDto.ts`
+  ```typescript
+  - status: enum InterviewStatus (optional)
+  - type: enum InterviewType (optional)
+  - page: number (optional, default: 1, min: 1)
+  - limit: number (optional, default: 10, min: 1, max: 50)
+  - sortBy: string (optional, default: 'createdAt')
+  - sortOrder: 'asc' | 'desc' (optional, default: 'desc')
+  - Validações: @IsOptional(), @IsEnum(), @IsInt(), @Min(), @Max()
+  ```
+
+- [ ] Criar `src/infra/http/dtos/interview/UpdateInterviewDto.ts` (se necessário)
+
+---
+
+### 3.2 - Presenters (Response Formatters)
+> Formatadores para transformar entidades de domínio em responses HTTP
+
 - [ ] Criar `src/infra/http/presenters/interview.presenter.ts`
-  - Formatar entidade Interview para response
-  - Ocultar campos sensíveis se necessário
+  ```typescript
+  export class InterviewPresenter {
+    static toHTTP(interview: Interview): InterviewResponse
+    static toHTTPList(interviews: Interview[]): InterviewListResponse
+  }
   - Formatar datas para ISO 8601
+  - Ocultar campos sensíveis (se houver)
+  - Estrutura limpa e consistente
+  ```
 
 - [ ] Criar `src/infra/http/presenters/message.presenter.ts`
-  - Formatar entidade Message para response
-  - Incluir metadata formatado
+  ```typescript
+  export class MessagePresenter {
+    static toHTTP(message: Message): MessageResponse
+    static toHTTPList(messages: Message[]): MessageResponse[]
+  }
+  - Formatar metadata
+  - Formatar datas
+  ```
 
-### 3.8 - Implementar Validações de Regras de Negócio
-- [ ] Validar que interview está IN_PROGRESS ao enviar mensagem
-- [ ] Validar que interview não está CANCELLED ou COMPLETED
-- [ ] Validar que usuário não excedeu limite de caracteres
-- [ ] Validar que currículo e vaga têm conteúdo relevante (não apenas espaços)
+- [ ] Criar `src/infra/http/presenters/pagination.presenter.ts`
+  ```typescript
+  export class PaginationPresenter {
+    static toHTTP(data: IListInterviewsResult): PaginationResponse
+  }
+  - Formatar metadata de paginação
+  ```
 
-### 3.9 - Implementar Sistema de Rate Limiting (Opcional)
-- [ ] Instalar `@nestjs/throttler`
-- [ ] Configurar rate limiting para rotas de messages
-  - Limite: 10 mensagens por minuto por usuário
-  - Proteger contra spam
+---
 
-### 3.10 - Implementar Testes E2E
-- [ ] Criar `test/interview.e2e-spec.ts`
-  - Setup: criar usuário de teste, fazer login, obter token
+### 3.3 - Exception Filters
+> Interceptar exceções e formatar respostas de erro padronizadas
 
-- [ ] Testar POST /interviews
-  - Sucesso: criar interview com dados válidos
-  - Erro: sem créditos disponíveis
-  - Erro: dados inválidos (resumeDescription curto)
-  - Erro: sem autenticação
+- [ ] Criar `src/infra/http/filters/http-exception.filter.ts`
+  ```typescript
+  @Catch(HttpException)
+  export class HttpExceptionFilter implements ExceptionFilter {
+    catch(exception: HttpException, host: ArgumentsHost)
+  }
+  - Capturar todas as HttpExceptions
+  - Retornar formato: { statusCode, message, timestamp, path, error }
+  - Incluir stack trace apenas em desenvolvimento
+  ```
 
-- [ ] Testar POST /interviews/:id/messages
-  - Sucesso: enviar mensagem e receber resposta da IA
-  - Erro: interview não existe
-  - Erro: interview não pertence ao usuário
-  - Erro: interview já está COMPLETED
-  - Erro: mensagem vazia
+- [ ] Criar `src/infra/http/filters/all-exceptions.filter.ts`
+  ```typescript
+  @Catch()
+  export class AllExceptionsFilter implements ExceptionFilter
+  - Capturar exceções não tratadas
+  - Retornar 500 Internal Server Error
+  - Logar erro completo
+  ```
 
-- [ ] Testar POST /interviews/:id/complete
-  - Sucesso: finalizar interview e receber feedback
-  - Sucesso: validar que feedback e insights foram gerados
-  - Erro: interview já está COMPLETED
-  - Erro: interview não pertence ao usuário
+- [ ] Criar exceções customizadas (se necessário):
+  ```typescript
+  - InterviewNotFoundException extends NotFoundException
+  - InterviewAlreadyCompletedException extends ConflictException
+  - InsufficientCreditsException extends ForbiddenException
+  - InvalidInterviewStatusException extends BadRequestException
+  ```
 
-- [ ] Testar GET /interviews/:id
-  - Sucesso: buscar interview com histórico completo
-  - Erro: interview não existe
-  - Erro: interview não pertence ao usuário
+- [ ] Aplicar filters globalmente no `main.ts`:
+  ```typescript
+  app.useGlobalFilters(
+    new AllExceptionsFilter(),
+    new HttpExceptionFilter(),
+  );
+  ```
 
-- [ ] Testar GET /interviews
-  - Sucesso: listar interviews do usuário
-  - Sucesso: filtrar por status (COMPLETED)
-  - Sucesso: paginação funciona corretamente
-  - Sucesso: ordenação por data
+---
 
-- [ ] Testar PATCH /interviews/:id/cancel
-  - Sucesso: cancelar interview IN_PROGRESS
-  - Sucesso: validar que crédito não foi devolvido
-  - Erro: interview já está COMPLETED
+### 3.4 - Pipes de Transformação
+> Pipes para validar e transformar dados de entrada
 
-### 3.11 - Documentação das Rotas
-- [ ] Documentar payloads de exemplo para cada rota
-- [ ] Documentar responses de sucesso
-- [ ] Documentar responses de erro
-- [ ] Criar exemplos de uso com cURL/Postman
+- [ ] Criar `src/infra/http/pipes/parse-uuid.pipe.ts`
+  ```typescript
+  @Injectable()
+  export class ParseUUIDPipe implements PipeTransform
+  - Validar formato UUID
+  - Lançar BadRequestException se inválido
+  - Retornar UUID validado
+  ```
 
-### 3.12 - Criar Swagger Documentation (Opcional)
-- [ ] Instalar `@nestjs/swagger`
-- [ ] Adicionar decorators nos DTOs (@ApiProperty)
-- [ ] Adicionar decorators no controller (@ApiTags, @ApiOperation)
-- [ ] Configurar Swagger module no main.ts
-- [ ] Gerar documentação em /api/docs
+- [ ] Configurar ValidationPipe global no `main.ts`:
+  ```typescript
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true,
+      forbidNonWhitelisted: true,
+      transform: true,
+    }),
+  );
+  ```
 
-### 3.13 - Implementar Health Check
+---
+
+### 3.5 - Interceptors
+> Interceptors para transformar responses e adicionar logging
+
+- [ ] Criar `src/infra/http/interceptors/transform-response.interceptor.ts`
+  ```typescript
+  @Injectable()
+  export class TransformResponseInterceptor implements NestInterceptor
+  - Padronizar formato de resposta de sucesso:
+    {
+      success: true,
+      data: {...},
+      timestamp: ISO 8601
+    }
+  - Aplicar a todas as respostas
+  ```
+
+- [ ] Criar `src/infra/http/interceptors/logging.interceptor.ts`
+  ```typescript
+  @Injectable()
+  export class LoggingInterceptor implements NestInterceptor
+  - Logar: método, URL, userId, status, tempo de execução
+  - Usar Logger do NestJS
+  - Incluir request ID (se disponível)
+  ```
+
+- [ ] Aplicar interceptors globalmente no `main.ts`:
+  ```typescript
+  app.useGlobalInterceptors(
+    new LoggingInterceptor(),
+    new TransformResponseInterceptor(),
+  );
+  ```
+
+---
+
+### 3.6 - Middlewares HTTP
+> Middlewares para validações específicas antes dos controllers
+
+- [ ] Criar `src/infra/http/middlewares/check-interview-owner.middleware.ts`
+  ```typescript
+  @Injectable()
+  export class CheckInterviewOwnerMiddleware implements NestMiddleware
+  - Verificar se interview pertence ao usuário autenticado
+  - Buscar interview pelo ID do param
+  - Comparar interview.userId com req.user.id
+  - Lançar ForbiddenException se não for o dono
+  - Anexar interview ao request (req.interview) para otimização
+  ```
+
+- [ ] Aplicar middleware nas rotas específicas:
+  ```typescript
+  // No InterviewModule
+  configure(consumer: MiddlewareConsumer) {
+    consumer
+      .apply(CheckInterviewOwnerMiddleware)
+      .forRoutes(
+        { path: 'interviews/:id/messages', method: RequestMethod.POST },
+        { path: 'interviews/:id/complete', method: RequestMethod.POST },
+        { path: 'interviews/:id', method: RequestMethod.GET },
+        { path: 'interviews/:id/cancel', method: RequestMethod.PATCH },
+      );
+  }
+  ```
+
+> **NOTA:** Validação de créditos já está implementada dentro do `CheckUserUsageService` chamado pelo `StartInterviewService`, não é necessário middleware HTTP separado.
+
+---
+
+### 3.7 - Interview Controller
+> Controller REST para gerenciar entrevistas
+
+- [ ] Criar `src/infra/http/controllers/interview.controller.ts`
+
+**Configuração base:**
+```typescript
+@Controller('interviews')
+@UseGuards(JwtAuthGuard)
+@UseInterceptors(TransformResponseInterceptor)
+export class InterviewController {
+  constructor(
+    private startInterviewService: StartInterviewService,
+    private sendMessageService: SendMessageService,
+    private completeInterviewService: CompleteInterviewService,
+    private getInterviewHistoryService: GetInterviewHistoryService,
+    private listUserInterviewsService: ListUserInterviewsService,
+    private cancelInterviewService: CancelInterviewService,
+  ) {}
+}
+```
+
+**Rotas a implementar:**
+
+- [ ] **POST /interviews** - Iniciar nova entrevista
+  ```typescript
+  @Post()
+  @HttpCode(HttpStatus.CREATED)
+  async create(
+    @Body() dto: StartInterviewDto,
+    @CurrentUser() user: User,
+  ): Promise<InterviewResponse>
+
+  - Chamar startInterviewService.execute()
+  - Usar InterviewPresenter e MessagePresenter
+  - Retornar { interview, firstMessage }
+  ```
+
+- [ ] **POST /interviews/:id/messages** - Enviar mensagem
+  ```typescript
+  @Post(':id/messages')
+  @HttpCode(HttpStatus.CREATED)
+  async sendMessage(
+    @Param('id', ParseUUIDPipe) interviewId: string,
+    @Body() dto: SendMessageDto,
+    @CurrentUser() user: User,
+  ): Promise<MessageExchangeResponse>
+
+  - Chamar sendMessageService.execute()
+  - Usar MessagePresenter
+  - Retornar { userMessage, assistantMessage }
+  ```
+
+- [ ] **POST /interviews/:id/complete** - Finalizar entrevista
+  ```typescript
+  @Post(':id/complete')
+  async complete(
+    @Param('id', ParseUUIDPipe) interviewId: string,
+    @CurrentUser() user: User,
+  ): Promise<InterviewResponse>
+
+  - Chamar completeInterviewService.execute()
+  - Usar InterviewPresenter
+  - Retornar interview com feedback, insights e score
+  ```
+
+- [ ] **GET /interviews/:id** - Buscar entrevista específica
+  ```typescript
+  @Get(':id')
+  async findOne(
+    @Param('id', ParseUUIDPipe) interviewId: string,
+    @CurrentUser() user: User,
+  ): Promise<InterviewWithMessagesResponse>
+
+  - Chamar getInterviewHistoryService.execute()
+  - Usar InterviewPresenter e MessagePresenter
+  - Retornar { interview, messages }
+  ```
+
+- [ ] **GET /interviews** - Listar entrevistas do usuário
+  ```typescript
+  @Get()
+  async findAll(
+    @Query() query: ListInterviewsQueryDto,
+    @CurrentUser() user: User,
+  ): Promise<PaginatedInterviewsResponse>
+
+  - Chamar listUserInterviewsService.execute()
+  - Usar InterviewPresenter e PaginationPresenter
+  - Retornar { interviews, metadata }
+  ```
+
+- [ ] **PATCH /interviews/:id/cancel** - Cancelar entrevista
+  ```typescript
+  @Patch(':id/cancel')
+  async cancel(
+    @Param('id', ParseUUIDPipe) interviewId: string,
+    @CurrentUser() user: User,
+  ): Promise<InterviewResponse>
+
+  - Chamar cancelInterviewService.execute()
+  - Usar InterviewPresenter
+  - Retornar interview atualizada
+  ```
+
+---
+
+### 3.8 - Health Check Controller
+> Controller para monitoramento de saúde da aplicação
+
 - [ ] Criar `src/infra/http/controllers/health.controller.ts`
-  - GET /health - Status da aplicação
-  - Verificar conexão com banco
-  - Verificar conexão com IA provider
-  - Retornar status geral
+  ```typescript
+  @Controller('health')
+  @Public() // Decorator para permitir acesso sem autenticação
+  export class HealthController {
+    @Get()
+    check(): HealthCheckResponse
+  }
+  ```
+
+- [ ] Implementar health checks:
+  ```typescript
+  - Verificar conexão com banco (Prisma.$queryRaw)
+  - Verificar disponibilidade da API de IA (opcional)
+  - Retornar status geral: { status: 'ok', timestamp, services: {...} }
+  ```
 
 ---
 
-## Exemplos de Payloads
+### 3.9 - Atualizar HTTP Module
+> Registrar controllers e providers no HttpModule
 
-### POST /interviews
-```json
-{
-  "resumeDescription": "Desenvolvedor Full Stack com 5 anos de experiência em Node.js, React e TypeScript. Trabalhei em projetos de e-commerce e sistemas bancários...",
-  "jobDescription": "Vaga para Desenvolvedor Sênior em empresa de fintech. Requisitos: Node.js, TypeScript, NestJS, PostgreSQL, Docker...",
-  "type": "TEXT"
-}
-```
-
-**Response (201 Created):**
-```json
-{
-  "success": true,
-  "data": {
-    "interview": {
-      "id": "uuid-123",
-      "userId": "user-uuid",
-      "type": "TEXT",
-      "status": "IN_PROGRESS",
-      "resumeDescription": "...",
-      "jobDescription": "...",
-      "createdAt": "2025-01-15T10:00:00Z"
-    },
-    "firstMessage": {
-      "id": "msg-uuid-1",
-      "role": "ASSISTANT",
-      "content": "Olá! Sou seu entrevistador virtual. Analisei seu currículo e a descrição da vaga. Vamos começar?...",
-      "createdAt": "2025-01-15T10:00:01Z"
-    }
-  },
-  "timestamp": "2025-01-15T10:00:01Z"
-}
-```
-
-### POST /interviews/:id/messages
-```json
-{
-  "content": "Sim, estou pronto para começar!"
-}
-```
-
-**Response (201 Created):**
-```json
-{
-  "success": true,
-  "data": {
-    "userMessage": {
-      "id": "msg-uuid-2",
-      "role": "USER",
-      "content": "Sim, estou pronto para começar!",
-      "createdAt": "2025-01-15T10:01:00Z"
-    },
-    "assistantMessage": {
-      "id": "msg-uuid-3",
-      "role": "ASSISTANT",
-      "content": "Ótimo! Vamos começar com uma pergunta sobre sua experiência...",
-      "createdAt": "2025-01-15T10:01:02Z"
-    }
-  },
-  "timestamp": "2025-01-15T10:01:02Z"
-}
-```
-
-### POST /interviews/:id/complete
-**Response (200 OK):**
-```json
-{
-  "success": true,
-  "data": {
-    "interview": {
-      "id": "uuid-123",
-      "status": "COMPLETED",
-      "score": 85,
-      "feedback": "Você teve um desempenho muito bom. Pontos fortes: comunicação clara, conhecimento técnico sólido...",
-      "insights": "Seu currículo está bem alinhado com a vaga. Sugestões: adicionar mais detalhes sobre projetos com Docker...",
-      "completedAt": "2025-01-15T10:30:00Z"
-    }
-  },
-  "timestamp": "2025-01-15T10:30:00Z"
-}
-```
-
-### GET /interviews?status=COMPLETED&page=1&limit=10
-**Response (200 OK):**
-```json
-{
-  "success": true,
-  "data": {
-    "interviews": [
-      {
-        "id": "uuid-123",
-        "type": "TEXT",
-        "status": "COMPLETED",
-        "score": 85,
-        "createdAt": "2025-01-15T10:00:00Z",
-        "completedAt": "2025-01-15T10:30:00Z"
-      }
+- [ ] Atualizar `src/infra/http/http.module.ts`:
+  ```typescript
+  @Module({
+    imports: [UserModule, InterviewModule],
+    controllers: [
+      AuthController,
+      InterviewController,
+      HealthController,
     ],
-    "metadata": {
-      "total": 1,
-      "page": 1,
-      "limit": 10,
-      "totalPages": 1
-    }
-  },
-  "timestamp": "2025-01-15T11:00:00Z"
-}
+    providers: [
+      { provide: APP_GUARD, useClass: JwtAuthGuard },
+      { provide: APP_FILTER, useClass: AllExceptionsFilter },
+      { provide: APP_FILTER, useClass: HttpExceptionFilter },
+      { provide: APP_INTERCEPTOR, useClass: LoggingInterceptor },
+      { provide: APP_INTERCEPTOR, useClass: TransformResponseInterceptor },
+    ],
+  })
+  export class HttpModule {}
+  ```
+
+---
+
+### 3.10 - Testes E2E
+> Testes end-to-end para todas as rotas
+
+- [ ] Criar `test/interview.e2e-spec.ts`
+
+**Setup:**
+```typescript
+beforeAll(async () => {
+  // Inicializar app de teste
+  // Criar usuário de teste
+  // Fazer login e obter token JWT
+});
+
+beforeEach(async () => {
+  // Limpar banco de dados
+});
 ```
 
+**Testes a implementar:**
+
+- [ ] **POST /interviews**
+  - ✅ Sucesso: criar interview com dados válidos
+  - ❌ Erro 400: resumeDescription muito curto (<50 chars)
+  - ❌ Erro 400: jobDescription muito curto (<50 chars)
+  - ❌ Erro 401: sem token de autenticação
+  - ❌ Erro 403: sem créditos disponíveis (testar plano FREE)
+  - ✅ Sucesso: validar que primeira mensagem da IA foi criada
+
+- [ ] **POST /interviews/:id/messages**
+  - ✅ Sucesso: enviar mensagem e receber resposta da IA
+  - ❌ Erro 400: UUID inválido
+  - ❌ Erro 400: content vazio
+  - ❌ Erro 401: sem autenticação
+  - ❌ Erro 403: interview não pertence ao usuário
+  - ❌ Erro 404: interview não existe
+  - ❌ Erro 409: interview já está COMPLETED
+  - ❌ Erro 409: interview está CANCELLED
+
+- [ ] **POST /interviews/:id/complete**
+  - ✅ Sucesso: finalizar interview e receber feedback
+  - ✅ Sucesso: validar que feedback, insights e score foram gerados
+  - ✅ Sucesso: validar que status mudou para COMPLETED
+  - ❌ Erro 400: UUID inválido
+  - ❌ Erro 401: sem autenticação
+  - ❌ Erro 403: interview não pertence ao usuário
+  - ❌ Erro 404: interview não existe
+  - ❌ Erro 409: interview já está COMPLETED
+
+- [ ] **GET /interviews/:id**
+  - ✅ Sucesso: buscar interview com histórico completo
+  - ✅ Sucesso: validar que todas as mensagens estão presentes
+  - ❌ Erro 400: UUID inválido
+  - ❌ Erro 401: sem autenticação
+  - ❌ Erro 403: interview não pertence ao usuário
+  - ❌ Erro 404: interview não existe
+
+- [ ] **GET /interviews**
+  - ✅ Sucesso: listar interviews do usuário
+  - ✅ Sucesso: filtrar por status (COMPLETED)
+  - ✅ Sucesso: filtrar por type (TEXT)
+  - ✅ Sucesso: paginação funciona (page=1, limit=10)
+  - ✅ Sucesso: ordenação funciona (sortBy=createdAt, sortOrder=desc)
+  - ✅ Sucesso: metadata de paginação está correta (total, totalPages)
+  - ❌ Erro 401: sem autenticação
+  - ✅ Sucesso: lista vazia se não tem interviews
+
+- [ ] **PATCH /interviews/:id/cancel**
+  - ✅ Sucesso: cancelar interview IN_PROGRESS
+  - ✅ Sucesso: validar que status mudou para CANCELLED
+  - ✅ Sucesso: validar que crédito NÃO foi devolvido
+  - ❌ Erro 400: UUID inválido
+  - ❌ Erro 401: sem autenticação
+  - ❌ Erro 403: interview não pertence ao usuário
+  - ❌ Erro 404: interview não existe
+  - ❌ Erro 409: interview já está COMPLETED
+
+- [ ] **GET /health**
+  - ✅ Sucesso: retorna status 200 e { status: 'ok' }
+  - ✅ Sucesso: não requer autenticação
+
 ---
 
-## Regras de Validação
+### 3.11 - Rate Limiting (Opcional)
+> Proteger contra spam e abuso
 
-### StartInterviewDto
-- `resumeDescription`: 50-5000 caracteres, não pode ser apenas espaços
-- `jobDescription`: 50-5000 caracteres, não pode ser apenas espaços
-- `type`: deve ser enum válido (TEXT ou AUDIO)
+- [ ] Instalar dependência:
+  ```bash
+  npm install @nestjs/throttler
+  ```
 
-### SendMessageDto
-- `content`: 1-2000 caracteres, não pode ser vazio ou apenas espaços
+- [ ] Configurar `ThrottlerModule` no `app.module.ts`:
+  ```typescript
+  @Module({
+    imports: [
+      ThrottlerModule.forRoot({
+        ttl: 60, // 1 minuto
+        limit: 10, // 10 requests
+      }),
+    ],
+  })
+  ```
 
-### ListInterviewsQueryDto
-- `page`: número inteiro, mínimo 1
-- `limit`: número inteiro, mínimo 1, máximo 50
-- `status`: deve ser enum válido se fornecido
-- `type`: deve ser enum válido se fornecido
-
----
-
-## Códigos de Erro HTTP
-
-| Código | Erro | Descrição |
-|--------|------|-----------|
-| 400 | Bad Request | Dados de entrada inválidos |
-| 401 | Unauthorized | Token JWT inválido ou ausente |
-| 403 | Forbidden | Sem créditos ou sem permissão |
-| 404 | Not Found | Interview não encontrada |
-| 409 | Conflict | Interview já está COMPLETED |
-| 422 | Unprocessable Entity | Regra de negócio violada |
-| 429 | Too Many Requests | Rate limit excedido |
-| 500 | Internal Server Error | Erro interno do servidor |
+- [ ] Aplicar throttler específico para rotas de mensagens:
+  ```typescript
+  @Throttle(10, 60) // 10 mensagens por minuto
+  @Post(':id/messages')
+  async sendMessage(...)
+  ```
 
 ---
 
-## Fluxo Completo de Uso (Happy Path)
+### 3.12 - Swagger Documentation (Opcional)
+> Documentação automática da API
 
-1. **Usuário se autentica** → Recebe JWT token
-2. **POST /interviews** → Cria interview, recebe primeira mensagem da IA
-3. **POST /interviews/:id/messages** (múltiplas vezes) → Conversa com IA
-4. **POST /interviews/:id/complete** → Finaliza e recebe feedback completo
-5. **GET /interviews/:id** → Visualiza histórico completo
-6. **GET /interviews** → Lista todas suas entrevistas
+- [ ] Instalar dependências:
+  ```bash
+  npm install @nestjs/swagger swagger-ui-express
+  ```
+
+- [ ] Configurar Swagger no `main.ts`:
+  ```typescript
+  const config = new DocumentBuilder()
+    .setTitle('IA Assistant API')
+    .setDescription('API para simulações de entrevistas com IA')
+    .setVersion('1.0')
+    .addBearerAuth()
+    .build();
+
+  const document = SwaggerModule.createDocument(app, config);
+  SwaggerModule.setup('api/docs', app, document);
+  ```
+
+- [ ] Adicionar decorators nos DTOs:
+  ```typescript
+  export class StartInterviewDto {
+    @ApiProperty({
+      description: 'Descrição do currículo do candidato',
+      minLength: 50,
+      maxLength: 5000,
+      example: 'Desenvolvedor Full Stack com 5 anos...',
+    })
+    @IsString()
+    @MinLength(50)
+    @MaxLength(5000)
+    resumeDescription: string;
+  }
+  ```
+
+- [ ] Adicionar decorators no controller:
+  ```typescript
+  @ApiTags('interviews')
+  @ApiBearerAuth()
+  @Controller('interviews')
+  export class InterviewController {
+
+    @ApiOperation({ summary: 'Iniciar nova entrevista' })
+    @ApiResponse({ status: 201, description: 'Interview criada' })
+    @ApiResponse({ status: 403, description: 'Sem créditos' })
+    @Post()
+    async create(...)
+  }
+  ```
 
 ---
 
-## Dependências Adicionais
+### 3.13 - Configuração do Main.ts
+> Configurar aplicação com todos os pipes, filters e interceptors
 
-```bash
-# Rate limiting (opcional)
-npm install @nestjs/throttler
+- [ ] Atualizar `src/main.ts`:
+  ```typescript
+  async function bootstrap() {
+    const app = await NestFactory.create(AppModule);
 
-# Swagger documentation (opcional)
-npm install @nestjs/swagger swagger-ui-express
-```
+    // CORS
+    app.enableCors({
+      origin: process.env.FRONTEND_URL,
+      credentials: true,
+    });
+
+    // Cookie Parser
+    app.use(cookieParser());
+
+    // Global Prefix
+    app.setGlobalPrefix('api');
+
+    // Validation Pipe
+    app.useGlobalPipes(
+      new ValidationPipe({
+        whitelist: true,
+        forbidNonWhitelisted: true,
+        transform: true,
+      }),
+    );
+
+    // Exception Filters (já configurados via providers)
+    // Interceptors (já configurados via providers)
+
+    await app.listen(process.env.PORT || 3001);
+  }
+  ```
 
 ---
 
 ## Checklist Final
 
-- [ ] Todos os controllers implementados
-- [ ] Todos os DTOs validados
-- [ ] Middlewares de segurança aplicados
-- [ ] Exception filters configurados
-- [ ] Testes E2E passando
-- [ ] Documentação completa
-- [ ] Rate limiting configurado
+**DTOs e Validação:**
+- [ ] DTOs HTTP criados (Start, SendMessage, List)
+- [ ] Validações com class-validator configuradas
+- [ ] ValidationPipe global configurado
+
+**Formatação de Respostas:**
+- [ ] Presenters criados (Interview, Message, Pagination)
+- [ ] TransformResponseInterceptor implementado
+- [ ] Formato padronizado: { success, data, timestamp }
+
+**Error Handling:**
+- [ ] HttpExceptionFilter implementado
+- [ ] AllExceptionsFilter implementado
+- [ ] Exceções customizadas criadas (se necessário)
+- [ ] Filters aplicados globalmente
+
+**Controllers:**
+- [ ] InterviewController com 6 rotas implementado
+- [ ] HealthController implementado
+- [ ] Todos os use cases integrados
+
+**Middlewares e Guards:**
+- [ ] CheckInterviewOwnerMiddleware implementado
+- [ ] JwtAuthGuard aplicado globalmente
+- [ ] @Public() decorator funcionando
+
+**Pipes e Interceptors:**
+- [ ] ParseUUIDPipe implementado
+- [ ] LoggingInterceptor implementado
+- [ ] Interceptors aplicados globalmente
+
+**Testes:**
+- [ ] Testes E2E para todas as rotas
+- [ ] Happy paths testados
+- [ ] Error cases testados
+- [ ] Cobertura mínima de 80%
+
+**Documentação:**
+- [ ] Swagger configurado (opcional)
+- [ ] README com exemplos de uso atualizado
+- [ ] Postman collection criada (opcional)
+
+**Extras:**
+- [ ] Rate limiting configurado (opcional)
 - [ ] Health check funcionando
-- [ ] Logs implementados
-- [ ] Respostas padronizadas
+- [ ] Logs estruturados
+
+---
+
+## Estrutura de Resposta Padronizada
+
+**Sucesso:**
+```json
+{
+  "success": true,
+  "data": {
+    // ... dados da response
+  },
+  "timestamp": "2025-10-09T22:30:00.000Z"
+}
+```
+
+**Erro:**
+```json
+{
+  "statusCode": 400,
+  "message": "Validation failed",
+  "error": "Bad Request",
+  "timestamp": "2025-10-09T22:30:00.000Z",
+  "path": "/api/interviews"
+}
+```
+
+---
+
+## Códigos de Status HTTP
+
+| Código | Uso | Exemplo |
+|--------|-----|---------|
+| 200 | Sucesso (GET, PATCH) | Buscar interview, cancelar |
+| 201 | Criado (POST) | Criar interview, enviar mensagem |
+| 400 | Bad Request | Dados inválidos, UUID inválido |
+| 401 | Unauthorized | Token ausente ou inválido |
+| 403 | Forbidden | Sem créditos, sem permissão |
+| 404 | Not Found | Interview não existe |
+| 409 | Conflict | Interview já completada |
+| 429 | Too Many Requests | Rate limit excedido |
+| 500 | Internal Server Error | Erro no servidor |
+
+---
+
+## Próximos Passos Após STEP3
+
+**Fase de Testes e Qualidade:**
+- Testes unitários para use cases
+- Mocks do AIProvider
+- Aumentar cobertura de testes
+
+**Otimizações:**
+- Cache de histórico de mensagens (Redis)
+- Compressão de responses (gzip)
+- Database indexes
+
+**Features Futuras:**
+- Entrevistas por áudio (STEP4)
+- Sistema de pagamentos (Stripe)
+- Dashboard analytics
+- Modo empresa (RH)
