@@ -38,6 +38,10 @@ import { CancelInterviewService } from './useCases/CancelInterview/CancelIntervi
     CancelInterviewService,
   ],
   exports: [
+    // Repositories (needed by middlewares)
+    INTERVIEW_REPOSITORY,
+    MESSAGE_REPOSITORY,
+    // Use Cases
     StartInterviewService,
     SendMessageService,
     CompleteInterviewService,
