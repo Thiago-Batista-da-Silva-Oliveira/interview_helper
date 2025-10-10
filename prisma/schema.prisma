@@ -86,8 +86,9 @@ model Interview {
   createdAt         DateTime        @default(now())
   updatedAt         DateTime        @updatedAt
 
-  user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  messages Message[]
+  user               User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  messages           Message[]
+  interviewQuestions InterviewQuestion[]
 
   @@map("interviews")
 }
@@ -109,4 +110,73 @@ model Message {
   interview Interview @relation(fields: [interviewId], references: [id], onDelete: Cascade)
 
   @@map("messages")
+}
+
+enum QuestionCategory {
+  FRONTEND
+  BACKEND
+  FULLSTACK
+  MOBILE
+  DEVOPS
+  DATA_SCIENCE
+  SECURITY
+  CLOUD
+  TESTING
+  PRODUCT_MANAGEMENT
+  DESIGN
+  GENERAL
+}
+
+enum QuestionLevel {
+  JUNIOR
+  PLENO
+  SENIOR
+  STAFF
+  PRINCIPAL
+}
+
+enum QuestionDifficulty {
+  EASY
+  MEDIUM
+  HARD
+}
+
+model QuestionBank {
+  id              String             @id @default(cuid())
+  category        QuestionCategory
+  level           QuestionLevel
+  difficulty      QuestionDifficulty
+  question        String
+  suggestedAnswer String?            // Resposta sugerida (para admin/referência)
+  tags            String             // JSON array: ["React", "TypeScript", "Performance"]
+  isActive        Boolean            @default(true)
+  createdAt       DateTime           @default(now())
+  updatedAt       DateTime           @updatedAt
+
+  interviewQuestions InterviewQuestion[]
+
+  @@map("question_bank")
+}
+
+model InterviewQuestion {
+  id          String   @id @default(cuid())
+  interviewId String
+  questionId  String
+  askedAt     DateTime @default(now())
+
+  interview Interview     @relation(fields: [interviewId], references: [id], onDelete: Cascade)
+  question  QuestionBank  @relation(fields: [questionId], references: [id], onDelete: Cascade)
+
+  @@unique([interviewId, questionId])
+  @@map("interview_questions")
+}
+
+model Transcription {
+  id          String   @id @default(cuid())
+  interviewId String   @unique
+  audioUrl    String
+  textContent String
+  createdAt   DateTime @default(now())
+
+  @@map("transcriptions")
 }
