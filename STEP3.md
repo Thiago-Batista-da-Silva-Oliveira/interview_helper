@@ -60,7 +60,7 @@ Implementar a **camada de apresentação HTTP** para expor os use cases de entre
 - ✅ Main.ts configurado (global prefix 'api', ValidationPipe, CORS)
 
 **Dependências Instaladas:**
-- ✅ `uuid` + `@types/uuid` para validação de UUID
+- ✅ Nenhuma adicional (todas já estavam instaladas)
 
 ### 🎯 Rotas Disponíveis
 
