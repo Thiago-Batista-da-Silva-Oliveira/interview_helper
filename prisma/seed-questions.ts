@@ -1,4 +1,10 @@
-import { PrismaClient } from '@prisma/client';
+/* eslint-disable @typescript-eslint/no-misused-promises */
+import {
+  PrismaClient,
+  QuestionCategory,
+  QuestionLevel,
+  QuestionDifficulty,
+} from '@prisma/client';
 
 const prisma = new PrismaClient();
 
@@ -7,27 +13,27 @@ const questions = [
 
   // FRONTEND - JUNIOR
   {
-    category: 'FRONTEND',
-    level: 'JUNIOR',
-    difficulty: 'EASY',
+    category: QuestionCategory.FRONTEND,
+    level: QuestionLevel.JUNIOR,
+    difficulty: QuestionDifficulty.EASY,
     question: 'O que é o Virtual DOM e por que ele é importante no React?',
     suggestedAnswer:
       'O Virtual DOM é uma representação em memória do DOM real. Ele permite que o React compare mudanças e atualize apenas o necessário, melhorando a performance.',
     tags: ['React', 'Virtual DOM', 'Performance'],
   },
   {
-    category: 'FRONTEND',
-    level: 'JUNIOR',
-    difficulty: 'EASY',
+    category: QuestionCategory.FRONTEND,
+    level: QuestionLevel.JUNIOR,
+    difficulty: QuestionDifficulty.EASY,
     question: 'Explique a diferença entre let, const e var em JavaScript.',
     suggestedAnswer:
       'var tem escopo de função e é hoisted. let e const têm escopo de bloco. const não permite reatribuição, enquanto let permite.',
     tags: ['JavaScript', 'ES6', 'Fundamentos'],
   },
   {
-    category: 'FRONTEND',
-    level: 'JUNIOR',
-    difficulty: 'MEDIUM',
+    category: QuestionCategory.FRONTEND,
+    level: QuestionLevel.JUNIOR,
+    difficulty: QuestionDifficulty.MEDIUM,
     question:
       'Como você otimizaria o carregamento de imagens em uma página web?',
     suggestedAnswer:
@@ -37,9 +43,9 @@ const questions = [
 
   // FRONTEND - PLENO
   {
-    category: 'FRONTEND',
-    level: 'PLENO',
-    difficulty: 'MEDIUM',
+    category: QuestionCategory.FRONTEND,
+    level: QuestionLevel.PLENO,
+    difficulty: QuestionDifficulty.MEDIUM,
     question:
       'Explique o conceito de Closures em JavaScript e dê um exemplo prático de uso.',
     suggestedAnswer:
@@ -47,9 +53,9 @@ const questions = [
     tags: ['JavaScript', 'Closures', 'Avançado'],
   },
   {
-    category: 'FRONTEND',
-    level: 'PLENO',
-    difficulty: 'MEDIUM',
+    category: QuestionCategory.FRONTEND,
+    level: QuestionLevel.PLENO,
+    difficulty: QuestionDifficulty.MEDIUM,
     question:
       'Como você implementaria um sistema de autenticação com JWT no frontend?',
     suggestedAnswer:
@@ -57,9 +63,9 @@ const questions = [
     tags: ['Authentication', 'JWT', 'Security'],
   },
   {
-    category: 'FRONTEND',
-    level: 'PLENO',
-    difficulty: 'HARD',
+    category: QuestionCategory.FRONTEND,
+    level: QuestionLevel.PLENO,
+    difficulty: QuestionDifficulty.HARD,
     question:
       'Você tem um componente React que re-renderiza muito. Como você debugaria e otimizaria isso?',
     suggestedAnswer:
@@ -69,9 +75,9 @@ const questions = [
 
   // FRONTEND - SENIOR
   {
-    category: 'FRONTEND',
-    level: 'SENIOR',
-    difficulty: 'HARD',
+    category: QuestionCategory.FRONTEND,
+    level: QuestionLevel.SENIOR,
+    difficulty: QuestionDifficulty.HARD,
     question:
       'Explique como funciona o reconciliation algorithm do React (Fiber) e seus principais benefícios.',
     suggestedAnswer:
@@ -79,9 +85,9 @@ const questions = [
     tags: ['React', 'Fiber', 'Internals', 'Arquitetura'],
   },
   {
-    category: 'FRONTEND',
-    level: 'SENIOR',
-    difficulty: 'HARD',
+    category: QuestionCategory.FRONTEND,
+    level: QuestionLevel.SENIOR,
+    difficulty: QuestionDifficulty.HARD,
     question:
       'Como você arquitetaria um micro-frontend escalável para uma aplicação enterprise?',
     suggestedAnswer:
@@ -93,27 +99,27 @@ const questions = [
 
   // BACKEND - JUNIOR
   {
-    category: 'BACKEND',
-    level: 'JUNIOR',
-    difficulty: 'EASY',
+    category: QuestionCategory.BACKEND,
+    level: QuestionLevel.JUNIOR,
+    difficulty: QuestionDifficulty.EASY,
     question: 'O que é REST e quais são os principais métodos HTTP?',
     suggestedAnswer:
       'REST é um estilo arquitetural para APIs. Métodos principais: GET (ler), POST (criar), PUT/PATCH (atualizar), DELETE (remover). Usa recursos e URIs.',
     tags: ['REST', 'API', 'HTTP'],
   },
   {
-    category: 'BACKEND',
-    level: 'JUNIOR',
-    difficulty: 'EASY',
+    category: QuestionCategory.BACKEND,
+    level: QuestionLevel.JUNIOR,
+    difficulty: QuestionDifficulty.EASY,
     question: 'Explique a diferença entre autenticação e autorização.',
     suggestedAnswer:
       'Autenticação verifica quem você é (login). Autorização verifica o que você pode fazer (permissões/roles).',
     tags: ['Security', 'Authentication', 'Authorization'],
   },
   {
-    category: 'BACKEND',
-    level: 'JUNIOR',
-    difficulty: 'MEDIUM',
+    category: QuestionCategory.BACKEND,
+    level: QuestionLevel.JUNIOR,
+    difficulty: QuestionDifficulty.MEDIUM,
     question: 'O que são indexes em banco de dados e quando você usaria um?',
     suggestedAnswer:
       'Indexes aceleram consultas criando estruturas de dados otimizadas. Usar em colunas frequentemente buscadas (WHERE, JOIN, ORDER BY). Trade-off: mais rápido para ler, mais lento para escrever.',
@@ -122,9 +128,9 @@ const questions = [
 
   // BACKEND - PLENO
   {
-    category: 'BACKEND',
-    level: 'PLENO',
-    difficulty: 'MEDIUM',
+    category: QuestionCategory.BACKEND,
+    level: QuestionLevel.PLENO,
+    difficulty: QuestionDifficulty.MEDIUM,
     question:
       'Como você implementaria paginação eficiente em uma API com milhões de registros?',
     suggestedAnswer:
@@ -132,18 +138,18 @@ const questions = [
     tags: ['API', 'Performance', 'Database', 'Pagination'],
   },
   {
-    category: 'BACKEND',
-    level: 'PLENO',
-    difficulty: 'MEDIUM',
+    category: QuestionCategory.BACKEND,
+    level: QuestionLevel.PLENO,
+    difficulty: QuestionDifficulty.MEDIUM,
     question: 'Explique o padrão Repository e quando você o usaria.',
     suggestedAnswer:
       'Repository abstrai acesso a dados, separando lógica de negócio de infraestrutura. Facilita testes (mock), trocar banco de dados, aplicar DDD. Útil em aplicações complexas.',
     tags: ['Design Patterns', 'Repository', 'Architecture', 'DDD'],
   },
   {
-    category: 'BACKEND',
-    level: 'PLENO',
-    difficulty: 'HARD',
+    category: QuestionCategory.BACKEND,
+    level: QuestionLevel.PLENO,
+    difficulty: QuestionDifficulty.HARD,
     question:
       'Como você lidaria com race conditions em um sistema de pagamentos?',
     suggestedAnswer:
@@ -153,9 +159,9 @@ const questions = [
 
   // BACKEND - SENIOR
   {
-    category: 'BACKEND',
-    level: 'SENIOR',
-    difficulty: 'HARD',
+    category: QuestionCategory.BACKEND,
+    level: QuestionLevel.SENIOR,
+    difficulty: QuestionDifficulty.HARD,
     question:
       'Explique o teorema CAP e como ele influencia o design de sistemas distribuídos.',
     suggestedAnswer:
@@ -163,9 +169,9 @@ const questions = [
     tags: ['Distributed Systems', 'CAP', 'Database', 'Architecture'],
   },
   {
-    category: 'BACKEND',
-    level: 'SENIOR',
-    difficulty: 'HARD',
+    category: QuestionCategory.BACKEND,
+    level: QuestionLevel.SENIOR,
+    difficulty: QuestionDifficulty.HARD,
     question:
       'Como você arquitetaria um sistema de processamento de 1 milhão de eventos por segundo?',
     suggestedAnswer:
@@ -177,18 +183,18 @@ const questions = [
 
   // DEVOPS - JUNIOR
   {
-    category: 'DEVOPS',
-    level: 'JUNIOR',
-    difficulty: 'EASY',
+    category: QuestionCategory.DEVOPS,
+    level: QuestionLevel.JUNIOR,
+    difficulty: QuestionDifficulty.EASY,
     question: 'O que é Docker e quais são seus benefícios principais?',
     suggestedAnswer:
       'Docker é containerização de aplicações. Benefícios: ambiente consistente, isolamento, portabilidade, facilita deploy, versionamento de infraestrutura.',
     tags: ['Docker', 'Containers', 'Infrastructure'],
   },
   {
-    category: 'DEVOPS',
-    level: 'JUNIOR',
-    difficulty: 'MEDIUM',
+    category: QuestionCategory.DEVOPS,
+    level: QuestionLevel.JUNIOR,
+    difficulty: QuestionDifficulty.MEDIUM,
     question: 'Explique a diferença entre CI e CD.',
     suggestedAnswer:
       'CI (Continuous Integration): automatiza testes e build a cada commit. CD (Continuous Deployment/Delivery): automatiza deploy para produção (Deployment) ou staging (Delivery).',
@@ -197,9 +203,9 @@ const questions = [
 
   // DEVOPS - PLENO
   {
-    category: 'DEVOPS',
-    level: 'PLENO',
-    difficulty: 'MEDIUM',
+    category: QuestionCategory.DEVOPS,
+    level: QuestionLevel.PLENO,
+    difficulty: QuestionDifficulty.MEDIUM,
     question:
       'Como você debugaria um pod no Kubernetes que está crashando continuamente?',
     suggestedAnswer:
@@ -207,9 +213,9 @@ const questions = [
     tags: ['Kubernetes', 'Debugging', 'Troubleshooting'],
   },
   {
-    category: 'DEVOPS',
-    level: 'PLENO',
-    difficulty: 'HARD',
+    category: QuestionCategory.DEVOPS,
+    level: QuestionLevel.PLENO,
+    difficulty: QuestionDifficulty.HARD,
     question:
       'Explique como você implementaria blue-green deployment em Kubernetes.',
     suggestedAnswer:
@@ -219,9 +225,9 @@ const questions = [
 
   // DEVOPS - SENIOR
   {
-    category: 'DEVOPS',
-    level: 'SENIOR',
-    difficulty: 'HARD',
+    category: QuestionCategory.DEVOPS,
+    level: QuestionLevel.SENIOR,
+    difficulty: QuestionDifficulty.HARD,
     question:
       'Como você desenharia uma estratégia de disaster recovery para um sistema crítico?',
     suggestedAnswer:
@@ -232,9 +238,9 @@ const questions = [
   // ==================== FULLSTACK ====================
 
   {
-    category: 'FULLSTACK',
-    level: 'PLENO',
-    difficulty: 'MEDIUM',
+    category: QuestionCategory.FULLSTACK,
+    level: QuestionLevel.PLENO,
+    difficulty: QuestionDifficulty.MEDIUM,
     question:
       'Como você implementaria real-time notifications em uma aplicação web (frontend + backend)?',
     suggestedAnswer:
@@ -242,9 +248,9 @@ const questions = [
     tags: ['WebSockets', 'Real-time', 'Fullstack'],
   },
   {
-    category: 'FULLSTACK',
-    level: 'SENIOR',
-    difficulty: 'HARD',
+    category: QuestionCategory.FULLSTACK,
+    level: QuestionLevel.SENIOR,
+    difficulty: QuestionDifficulty.HARD,
     question:
       'Você precisa migrar uma aplicação monolítica para microserviços. Como você planejaria essa migração?',
     suggestedAnswer:
@@ -255,18 +261,18 @@ const questions = [
   // ==================== DATA SCIENCE ====================
 
   {
-    category: 'DATA_SCIENCE',
-    level: 'PLENO',
-    difficulty: 'MEDIUM',
+    category: QuestionCategory.DATA_SCIENCE,
+    level: QuestionLevel.PLENO,
+    difficulty: QuestionDifficulty.MEDIUM,
     question: 'Explique overfitting e como você o detectaria e evitaria.',
     suggestedAnswer:
       'Overfitting: modelo memoriza dados de treino mas falha em generalizar. Detectar: gap entre treino/validação. Evitar: cross-validation, regularização, mais dados, feature selection, ensemble.',
     tags: ['Machine Learning', 'Overfitting', 'Model Training'],
   },
   {
-    category: 'DATA_SCIENCE',
-    level: 'SENIOR',
-    difficulty: 'HARD',
+    category: QuestionCategory.DATA_SCIENCE,
+    level: QuestionLevel.SENIOR,
+    difficulty: QuestionDifficulty.HARD,
     question:
       'Como você lidaria com dados extremamente desbalanceados em um modelo de classificação?',
     suggestedAnswer:
@@ -277,18 +283,18 @@ const questions = [
   // ==================== MOBILE ====================
 
   {
-    category: 'MOBILE',
-    level: 'PLENO',
-    difficulty: 'MEDIUM',
+    category: QuestionCategory.MOBILE,
+    level: QuestionLevel.PLENO,
+    difficulty: QuestionDifficulty.MEDIUM,
     question: 'Como você otimizaria o consumo de bateria em um app mobile?',
     suggestedAnswer:
       'Reduzir network requests, batch operations, usar WorkManager (Android)/Background Tasks (iOS), otimizar imagens, evitar animações desnecessárias, location tracking eficiente.',
     tags: ['Mobile', 'Performance', 'Battery Optimization'],
   },
   {
-    category: 'MOBILE',
-    level: 'SENIOR',
-    difficulty: 'HARD',
+    category: QuestionCategory.MOBILE,
+    level: QuestionLevel.SENIOR,
+    difficulty: QuestionDifficulty.HARD,
     question:
       'Explique a arquitetura MVVM no contexto de desenvolvimento mobile e suas vantagens.',
     suggestedAnswer:
@@ -299,9 +305,9 @@ const questions = [
   // ==================== SECURITY ====================
 
   {
-    category: 'SECURITY',
-    level: 'PLENO',
-    difficulty: 'MEDIUM',
+    category: QuestionCategory.SECURITY,
+    level: QuestionLevel.PLENO,
+    difficulty: QuestionDifficulty.MEDIUM,
     question:
       'Explique OWASP Top 10 e dê exemplos de como prevenir SQL Injection.',
     suggestedAnswer:
@@ -309,9 +315,9 @@ const questions = [
     tags: ['Security', 'OWASP', 'SQL Injection'],
   },
   {
-    category: 'SECURITY',
-    level: 'SENIOR',
-    difficulty: 'HARD',
+    category: QuestionCategory.SECURITY,
+    level: QuestionLevel.SENIOR,
+    difficulty: QuestionDifficulty.HARD,
     question:
       'Como você implementaria uma política de zero-trust security em uma arquitetura de microserviços?',
     suggestedAnswer:
@@ -322,9 +328,9 @@ const questions = [
   // ==================== CLOUD ====================
 
   {
-    category: 'CLOUD',
-    level: 'PLENO',
-    difficulty: 'MEDIUM',
+    category: QuestionCategory.CLOUD,
+    level: QuestionLevel.PLENO,
+    difficulty: QuestionDifficulty.MEDIUM,
     question:
       'Explique a diferença entre scaling vertical e horizontal. Quando usar cada um?',
     suggestedAnswer:
@@ -332,9 +338,9 @@ const questions = [
     tags: ['Cloud', 'Scalability', 'Architecture'],
   },
   {
-    category: 'CLOUD',
-    level: 'SENIOR',
-    difficulty: 'HARD',
+    category: QuestionCategory.CLOUD,
+    level: QuestionLevel.SENIOR,
+    difficulty: QuestionDifficulty.HARD,
     question:
       'Como você otimizaria custos de cloud em uma aplicação serverless (AWS Lambda)?',
     suggestedAnswer:
@@ -345,18 +351,18 @@ const questions = [
   // ==================== TESTING ====================
 
   {
-    category: 'TESTING',
-    level: 'PLENO',
-    difficulty: 'MEDIUM',
+    category: QuestionCategory.TESTING,
+    level: QuestionLevel.PLENO,
+    difficulty: QuestionDifficulty.MEDIUM,
     question: 'Explique a pirâmide de testes e por que ela é importante.',
     suggestedAnswer:
       'Base: muitos testes unitários (rápidos, baratos). Meio: testes de integração. Topo: poucos E2E (lentos, caros). Balancear cobertura, velocidade e confiança.',
     tags: ['Testing', 'Test Pyramid', 'Quality Assurance'],
   },
   {
-    category: 'TESTING',
-    level: 'SENIOR',
-    difficulty: 'HARD',
+    category: QuestionCategory.TESTING,
+    level: QuestionLevel.SENIOR,
+    difficulty: QuestionDifficulty.HARD,
     question: 'Como você implementaria contract testing entre microserviços?',
     suggestedAnswer:
       'Pact/Spring Cloud Contract, definir contratos entre consumer/provider, testes automatizados, versioning de contratos, CI/CD integration, backward compatibility.',
@@ -366,9 +372,9 @@ const questions = [
   // ==================== GENERAL (Soft Skills + Comportamental) ====================
 
   {
-    category: 'GENERAL',
-    level: 'PLENO',
-    difficulty: 'MEDIUM',
+    category: QuestionCategory.GENERAL,
+    level: QuestionLevel.PLENO,
+    difficulty: QuestionDifficulty.MEDIUM,
     question:
       'Conte sobre uma vez que você teve que refatorar código legado complexo. Como você abordou isso?',
     suggestedAnswer:
@@ -376,9 +382,9 @@ const questions = [
     tags: ['Soft Skills', 'Refactoring', 'Legacy Code'],
   },
   {
-    category: 'GENERAL',
-    level: 'SENIOR',
-    difficulty: 'MEDIUM',
+    category: QuestionCategory.GENERAL,
+    level: QuestionLevel.SENIOR,
+    difficulty: QuestionDifficulty.MEDIUM,
     question:
       'Como você lida com conflitos técnicos em uma equipe quando há opiniões divergentes sobre a solução?',
     suggestedAnswer:
@@ -386,9 +392,9 @@ const questions = [
     tags: ['Soft Skills', 'Leadership', 'Communication'],
   },
   {
-    category: 'GENERAL',
-    level: 'SENIOR',
-    difficulty: 'HARD',
+    category: QuestionCategory.GENERAL,
+    level: QuestionLevel.SENIOR,
+    difficulty: QuestionDifficulty.HARD,
     question:
       'Descreva como você priorizaria features quando há pressão de negócio mas também dívida técnica crítica.',
     suggestedAnswer:
@@ -399,9 +405,9 @@ const questions = [
   // ==================== PRODUCT MANAGEMENT ====================
 
   {
-    category: 'PRODUCT_MANAGEMENT',
-    level: 'PLENO',
-    difficulty: 'MEDIUM',
+    category: QuestionCategory.PRODUCT_MANAGEMENT,
+    level: QuestionLevel.PLENO,
+    difficulty: QuestionDifficulty.MEDIUM,
     question:
       'Como você validaria uma nova feature antes de desenvolvê-la completamente?',
     suggestedAnswer:
@@ -409,9 +415,9 @@ const questions = [
     tags: ['Product', 'Validation', 'MVP', 'User Research'],
   },
   {
-    category: 'PRODUCT_MANAGEMENT',
-    level: 'SENIOR',
-    difficulty: 'HARD',
+    category: QuestionCategory.PRODUCT_MANAGEMENT,
+    level: QuestionLevel.SENIOR,
+    difficulty: QuestionDifficulty.HARD,
     question:
       'Como você balancearia inovação vs estabilidade em um produto maduro com milhões de usuários?',
     suggestedAnswer:
@@ -422,9 +428,9 @@ const questions = [
   // ==================== DESIGN ====================
 
   {
-    category: 'DESIGN',
-    level: 'PLENO',
-    difficulty: 'MEDIUM',
+    category: QuestionCategory.DESIGN,
+    level: QuestionLevel.PLENO,
+    difficulty: QuestionDifficulty.MEDIUM,
     question:
       'Como você garantiria acessibilidade (a11y) em uma aplicação web?',
     suggestedAnswer:
@@ -432,9 +438,9 @@ const questions = [
     tags: ['Design', 'Accessibility', 'UX', 'Web'],
   },
   {
-    category: 'DESIGN',
-    level: 'SENIOR',
-    difficulty: 'HARD',
+    category: QuestionCategory.DESIGN,
+    level: QuestionLevel.SENIOR,
+    difficulty: QuestionDifficulty.HARD,
     question:
       'Como você conduziria um design system escalável para múltiplos produtos?',
     suggestedAnswer:
