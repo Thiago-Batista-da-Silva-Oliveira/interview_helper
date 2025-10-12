@@ -7,10 +7,14 @@ import {
 } from '@nestjs/common';
 import type { IInterviewRepository } from '@modules/interview/repositories/IInterviewRepository';
 import type { IMessageRepository } from '@modules/interview/repositories/IMessageRepository';
+import type { IInterviewQuestionRepository } from '@modules/interview/repositories/IInterviewQuestionRepository';
 import {
   INTERVIEW_REPOSITORY,
   MESSAGE_REPOSITORY,
+  INTERVIEW_QUESTION_REPOSITORY,
 } from '@modules/interview/repositories/tokens';
+import type { IQuestionBankRepository } from '@modules/question-bank/repositories/IQuestionBankRepository';
+import { QUESTION_BANK_REPOSITORY } from '@modules/question-bank/repositories/tokens';
 import { Message } from '@modules/interview/entities/Message';
 import { MessageRole } from '@modules/interview/dtos/IMessageDTO';
 import type { IAIProvider } from '@infra/ai/interfaces/IAIProvider';
@@ -18,6 +22,7 @@ import { IAIMessage } from '@infra/ai/interfaces/IAIProvider';
 import { AI_PROVIDER } from '@infra/ai/interfaces/tokens';
 import { SYSTEM_PROMPT } from '@modules/interview/prompts/system-prompt';
 import { buildConversationContext } from '@modules/interview/prompts/interview-prompt';
+import { buildConversationContextWithQuestions } from '@modules/interview/prompts/question-aware-prompt';
 
 interface ISendMessageRequest {
   userId: string;
@@ -37,6 +42,10 @@ export class SendMessageService {
     private interviewRepository: IInterviewRepository,
     @Inject(MESSAGE_REPOSITORY)
     private messageRepository: IMessageRepository,
+    @Inject(INTERVIEW_QUESTION_REPOSITORY)
+    private interviewQuestionRepository: IInterviewQuestionRepository,
+    @Inject(QUESTION_BANK_REPOSITORY)
+    private questionBankRepository: IQuestionBankRepository,
     @Inject(AI_PROVIDER)
     private aiProvider: IAIProvider,
   ) {}
@@ -78,6 +87,47 @@ export class SendMessageService {
     const messageHistory =
       await this.messageRepository.findByInterviewId(interviewId);
 
+    // Get questions suggested from the bank for this interview
+    const questionIds =
+      await this.interviewQuestionRepository.findQuestionIdsByInterviewId(
+        interviewId,
+      );
+
+    // Build context prompt based on whether we have questions or not
+    let contextPrompt: string;
+
+    if (questionIds.length > 0) {
+      // Fetch full question details from the bank
+      const questions = await Promise.all(
+        questionIds.map((id) => this.questionBankRepository.findById(id)),
+      );
+
+      // Filter out null values (in case some questions were deleted)
+      const validQuestions = questions.filter((q) => q !== null);
+
+      if (validQuestions.length > 0) {
+        // Use context with questions
+        contextPrompt = buildConversationContextWithQuestions(
+          interview.resumeDescription,
+          interview.jobDescription,
+          validQuestions,
+          [], // TODO: Track which questions were actually asked
+        );
+      } else {
+        // Fallback if all questions were deleted
+        contextPrompt = buildConversationContext(
+          interview.resumeDescription,
+          interview.jobDescription,
+        );
+      }
+    } else {
+      // Fallback: No questions from bank (old interviews or AI-generated questions)
+      contextPrompt = buildConversationContext(
+        interview.resumeDescription,
+        interview.jobDescription,
+      );
+    }
+
     // Build AI messages array
     const aiMessages: IAIMessage[] = [
       {
@@ -86,10 +136,7 @@ export class SendMessageService {
       },
       {
         role: 'system',
-        content: buildConversationContext(
-          interview.resumeDescription,
-          interview.jobDescription,
-        ),
+        content: contextPrompt,
       },
     ];
 
