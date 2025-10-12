@@ -106,12 +106,18 @@ export class SendMessageService {
       const validQuestions = questions.filter((q) => q !== null);
 
       if (validQuestions.length > 0) {
+        // Identify which questions were already asked by analyzing message history
+        const askedQuestionIds = this.identifyAskedQuestions(
+          validQuestions,
+          messageHistory,
+        );
+
         // Use context with questions
         contextPrompt = buildConversationContextWithQuestions(
           interview.resumeDescription,
           interview.jobDescription,
           validQuestions,
-          [], // TODO: Track which questions were actually asked
+          askedQuestionIds,
         );
       } else {
         // Fallback if all questions were deleted
@@ -166,5 +172,152 @@ export class SendMessageService {
       userMessage,
       assistantMessage,
     };
+  }
+
+  /**
+   * Identifica quais perguntas do banco já foram feitas analisando o histórico de mensagens.
+   * Usa matching de palavras-chave para detectar se uma pergunta foi feita pela IA.
+   */
+  private identifyAskedQuestions(
+    questions: Array<
+      Exclude<Awaited<ReturnType<IQuestionBankRepository['findById']>>, null>
+    >,
+    messageHistory: Message[],
+  ): string[] {
+    // Filtrar apenas mensagens da IA (ASSISTANT)
+    const assistantMessages = messageHistory.filter(
+      (msg) => msg.role === MessageRole.ASSISTANT,
+    );
+
+    if (assistantMessages.length === 0) {
+      return []; // Nenhuma pergunta foi feita ainda
+    }
+
+    const askedQuestionIds: string[] = [];
+
+    // Para cada pergunta do banco
+    for (const question of questions) {
+      // Verificar se a pergunta foi feita em alguma mensagem da IA
+      const wasAsked = this.wasQuestionAsked(
+        question.question,
+        assistantMessages,
+      );
+
+      if (wasAsked) {
+        askedQuestionIds.push(question.id.toString());
+      }
+    }
+
+    return askedQuestionIds;
+  }
+
+  /**
+   * Verifica se uma pergunta específica foi feita analisando as mensagens da IA.
+   * Usa normalização de texto e matching de palavras-chave.
+   */
+  private wasQuestionAsked(
+    questionText: string,
+    assistantMessages: Message[],
+  ): boolean {
+    // Normalizar a pergunta: lowercase, remover pontuação extra
+    const normalizedQuestion = this.normalizeText(questionText);
+
+    // Extrair palavras-chave principais (ignorar palavras comuns)
+    const keywords = this.extractKeywords(normalizedQuestion);
+
+    // Verificar se a maioria das palavras-chave aparece em alguma mensagem
+    for (const message of assistantMessages) {
+      const normalizedMessage = this.normalizeText(message.content);
+
+      // Contar quantas palavras-chave aparecem na mensagem
+      const matchedKeywords = keywords.filter((keyword) =>
+        normalizedMessage.includes(keyword),
+      );
+
+      // Se 70% ou mais das palavras-chave aparecem, considerar como "feita"
+      const matchPercentage = matchedKeywords.length / keywords.length;
+
+      if (matchPercentage >= 0.7 && keywords.length >= 3) {
+        return true;
+      }
+
+      // Para perguntas curtas (< 3 keywords), exigir 100% de match
+      if (keywords.length < 3 && matchedKeywords.length === keywords.length) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  /**
+   * Normaliza texto: lowercase, remove pontuação, trim
+   */
+  private normalizeText(text: string): string {
+    return text
+      .toLowerCase()
+      .replace(/[.,;:!?()[\]{}""'']/g, '') // Remove pontuação
+      .replace(/\s+/g, ' ') // Múltiplos espaços -> espaço único
+      .trim();
+  }
+
+  /**
+   * Extrai palavras-chave principais, removendo stopwords comuns
+   */
+  private extractKeywords(normalizedText: string): string[] {
+    // Stopwords comuns em português
+    const stopwords = new Set([
+      'o',
+      'a',
+      'os',
+      'as',
+      'um',
+      'uma',
+      'de',
+      'do',
+      'da',
+      'dos',
+      'das',
+      'em',
+      'no',
+      'na',
+      'nos',
+      'nas',
+      'para',
+      'com',
+      'por',
+      'e',
+      'ou',
+      'que',
+      'qual',
+      'quais',
+      'como',
+      'quando',
+      'onde',
+      'é',
+      'são',
+      'ser',
+      'foi',
+      'eram',
+      'você',
+      'voce',
+      'seu',
+      'sua',
+      'seus',
+      'suas',
+      'me',
+      'te',
+      'se',
+      'lhe',
+      'sobre',
+    ]);
+
+    const words = normalizedText.split(' ');
+
+    return words.filter(
+      (word) =>
+        word.length > 2 && // Ignorar palavras muito curtas
+        !stopwords.has(word), // Ignorar stopwords
+    );
   }
 }
