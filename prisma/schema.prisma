@@ -24,9 +24,12 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  sessions   UserSession[]
-  usage      UserUsage[]
-  interviews Interview[]
+  sessions      UserSession[]
+  usage         UserUsage[]
+  interviews    Interview[]
+  progress      UserProgress[]
+  achievements  UserAchievement[]
+  streak        UserStreak?
 
   @@map("users")
 }
@@ -86,9 +89,10 @@ model Interview {
   createdAt         DateTime        @default(now())
   updatedAt         DateTime        @updatedAt
 
-  user               User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user               User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
   messages           Message[]
   interviewQuestions InterviewQuestion[]
+  analytics          InterviewAnalytics?
 
   @@map("interviews")
 }
@@ -179,4 +183,139 @@ model Transcription {
   createdAt   DateTime @default(now())
 
   @@map("transcriptions")
+}
+
+// ==========================================
+// 📊 ANALYTICS - Arquitetura Genérica
+// ==========================================
+
+model InterviewAnalytics {
+  id                   String   @id @default(cuid())
+  interviewId          String   @unique
+
+  // Score geral (0-100)
+  overallScore         Int
+
+  // Métricas de comunicação
+  communicationQuality Int?     // 0-100
+  depthOfKnowledge     Int?     // 0-100
+  clarityScore         Int?     // 0-100
+
+  // Métricas temporais
+  avgResponseTime      Int?     // Segundos
+  totalDuration        Int?     // Minutos
+  totalMessages        Int      @default(0)
+
+  // Metadata adicional (JSON flexível)
+  metadata             String?  // Ex: { "nervousness": "low", "confidence": "high" }
+
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+
+  interview         Interview          @relation(fields: [interviewId], references: [id], onDelete: Cascade)
+  categoryScores    CategoryScore[]
+  difficultyScores  DifficultyScore[]
+
+  @@map("interview_analytics")
+}
+
+model CategoryScore {
+  id                String           @id @default(cuid())
+  analyticsId       String
+  category          QuestionCategory
+  score             Int              // 0-100
+
+  // Métricas adicionais
+  questionsAnswered Int              @default(0)
+  questionsCorrect  Int              @default(0)
+
+  analytics         InterviewAnalytics @relation(fields: [analyticsId], references: [id], onDelete: Cascade)
+
+  @@unique([analyticsId, category])
+  @@map("category_scores")
+}
+
+model DifficultyScore {
+  id                String             @id @default(cuid())
+  analyticsId       String
+  difficulty        QuestionDifficulty
+  score             Int                // 0-100
+
+  questionsAnswered Int                @default(0)
+
+  analytics         InterviewAnalytics @relation(fields: [analyticsId], references: [id], onDelete: Cascade)
+
+  @@unique([analyticsId, difficulty])
+  @@map("difficulty_scores")
+}
+
+// ==========================================
+// 📈 PROGRESSO DO USUÁRIO
+// ==========================================
+
+model UserProgress {
+  id              String   @id @default(cuid())
+  userId          String
+  month           String   // YYYY-MM
+
+  // Métricas agregadas
+  avgScore        Float
+  totalInterviews Int
+
+  // Padrões identificados (JSON)
+  weaknesses      String   // JSON array de categorias
+  strengths       String   // JSON array de categorias
+
+  // Tendência
+  trend           String   // "improving" | "stable" | "declining"
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  user             User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  categoryProgress CategoryProgress[]
+
+  @@unique([userId, month])
+  @@map("user_progress")
+}
+
+model CategoryProgress {
+  id         String           @id @default(cuid())
+  progressId String
+  category   QuestionCategory
+  count      Int              @default(0)
+  avgScore   Float            @default(0)
+
+  progress   UserProgress @relation(fields: [progressId], references: [id], onDelete: Cascade)
+
+  @@unique([progressId, category])
+  @@map("category_progress")
+}
+
+// ==========================================
+// 🏆 GAMIFICAÇÃO
+// ==========================================
+
+model UserAchievement {
+  id            String   @id @default(cuid())
+  userId        String
+  achievementId String   // ID da conquista (enum ou tabela separada)
+  unlockedAt    DateTime @default(now())
+
+  user          User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, achievementId])
+  @@map("user_achievements")
+}
+
+model UserStreak {
+  id            String   @id @default(cuid())
+  userId        String   @unique
+  currentStreak Int      @default(0)
+  longestStreak Int      @default(0)
+  lastActiveAt  DateTime
+
+  user          User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("user_streaks")
 }

@@ -41,10 +41,7 @@ export class SelectQuestionsService {
 
     // 1. Análise inteligente do contexto
     const detectedLevel = this.detectLevel(jobDescription);
-    const categories = this.detectCategories(
-      resumeDescription,
-      jobDescription,
-    );
+    const categories = this.detectCategories(resumeDescription, jobDescription);
     const matchedTags = this.extractTags(resumeDescription, jobDescription);
 
     // 2. Buscar perguntas no banco baseado nos critérios detectados
@@ -181,11 +178,7 @@ export class SelectQuestionsService {
         'php',
         'laravel',
       ],
-      [QuestionCategory.FULLSTACK]: [
-        'fullstack',
-        'full-stack',
-        'full stack',
-      ],
+      [QuestionCategory.FULLSTACK]: ['fullstack', 'full-stack', 'full stack'],
       [QuestionCategory.MOBILE]: [
         'mobile',
         'ios',
@@ -274,7 +267,7 @@ export class SelectQuestionsService {
     const detectedCategories: QuestionCategory[] = [];
 
     for (const [category, keywords] of Object.entries(categoryKeywords)) {
-      if (category === QuestionCategory.GENERAL) continue; // Processar por último
+      if (category === 'GENERAL') continue; // Processar por último
 
       if (keywords.some((keyword) => combined.includes(keyword))) {
         detectedCategories.push(category as QuestionCategory);

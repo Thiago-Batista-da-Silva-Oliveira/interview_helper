@@ -6,6 +6,121 @@
 
 ---
 
+## 📍 ESTADO ATUAL DA IMPLEMENTAÇÃO
+
+**Data:** 13/10/2024
+**Versão:** v2.1 (com Analytics - Backend Implementado)
+
+### ✅ O QUE ESTÁ FUNCIONANDO
+
+#### **Core do Sistema (100% completo)**
+- ✅ Sistema de autenticação e usuários
+- ✅ Banco de questões inteligente (40 perguntas seedadas)
+- ✅ Sistema de entrevistas (texto) com contexto
+- ✅ Detecção inteligente de perguntas feitas
+- ✅ Feedback automático da IA
+- ✅ Build compilando sem erros
+
+#### **Analytics - Backend (80% completo)**
+- ✅ **Tabelas criadas no banco** (migrations aplicadas):
+  - `interview_analytics` - métricas gerais
+  - `category_scores` - scores por categoria (GENÉRICO)
+  - `difficulty_scores` - scores por dificuldade (GENÉRICO)
+  - `user_progress` - progresso mensal
+  - `category_progress` - detalhes por categoria
+  - `user_achievements` - gamificação
+  - `user_streaks` - dias consecutivos
+
+- ✅ **Entities do domínio** (com validações completas):
+  - `InterviewAnalytics` - entity principal
+  - `CategoryScore` - genérico para qualquer categoria
+  - `DifficultyScore` - genérico para qualquer dificuldade
+
+- ✅ **Repositórios implementados**:
+  - `IInterviewAnalyticsRepository` (interface)
+  - `PrismaInterviewAnalyticsRepository` (implementação)
+  - Métodos CRUD completos
+
+- ✅ **Serviço de análise criado**:
+  - `AnalyzeInterviewService` (src/core/modules/analytics/useCases/AnalyzeInterview/)
+  - Calcula scores por categoria automaticamente
+  - Calcula scores por dificuldade
+  - Métricas temporais (duração, tempo médio de resposta)
+  - Estimativas de comunicação, profundidade e clareza
+
+### ⚠️ O QUE FALTA IMPLEMENTAR
+
+#### **Fase 1: Integração Automática (30min - 1h)**
+- [ ] Integrar `AnalyzeInterviewService` no `CompleteInterviewService`
+  - Atualmente o serviço existe mas não é chamado automaticamente
+  - **Arquivo:** `src/core/modules/interview/useCases/CompleteInterview/CompleteInterviewService.ts`
+  - **Linha sugerida:** Após salvar feedback (linha ~90)
+
+- [ ] Criar endpoint REST para buscar analytics
+  - `GET /interviews/:id/analytics` - buscar analytics de uma entrevista
+  - `GET /users/:userId/analytics/summary` - resumo do usuário
+  - **Local:** `src/infra/http/controllers/` (criar AnalyticsController)
+
+#### **Fase 2: Análise de Padrões (1-2 dias)**
+- [ ] `AnalyzeUserPatternsService` - detectar padrões recorrentes
+- [ ] `GenerateRecommendationsService` - gerar recomendações de estudo
+- [ ] `CalculateBenchmarksService` - comparar com outros usuários
+
+#### **Fase 3: Dashboard UI (1 semana)**
+- [ ] Frontend completo (React/Next.js/Vue)
+- [ ] Gráficos de evolução
+- [ ] Visualização de padrões
+
+#### **Fase 4: Gamificação (2-3 dias)**
+- [ ] `UnlockAchievementService` - lógica de badges
+- [ ] `UpdateStreakService` - lógica de streaks
+
+#### **Fase 5: Insights de IA (1 semana)**
+- [ ] Análise avançada de texto com IA
+- [ ] Relatórios mensais automatizados
+
+### 🗂️ ARQUIVOS IMPORTANTES CRIADOS
+
+```
+src/core/modules/analytics/
+├── entities/
+│   ├── InterviewAnalytics.ts      ✅ CRIADO
+│   ├── CategoryScore.ts           ✅ CRIADO
+│   └── DifficultyScore.ts         ✅ CRIADO
+├── dtos/
+│   └── IInterviewAnalyticsDTO.ts  ✅ CRIADO
+├── repositories/
+│   ├── IInterviewAnalyticsRepository.ts  ✅ CRIADO
+│   └── tokens.ts                         ✅ CRIADO
+├── useCases/
+│   └── AnalyzeInterview/
+│       └── AnalyzeInterviewService.ts    ✅ CRIADO
+└── analytics.module.ts            ✅ CRIADO
+
+src/infra/database/prisma/
+├── repositories/
+│   └── PrismaInterviewAnalyticsRepository.ts  ✅ CRIADO
+└── migrations/
+    └── 20251014015024_add_analytics_and_gamification/  ✅ CRIADO
+```
+
+### 🎯 PRÓXIMO PASSO RECOMENDADO
+
+**Opção A: Completar Fase 1 (recomendado)**
+1. Integrar AnalyzeInterviewService no CompleteInterviewService
+2. Criar endpoint REST básico
+3. Testar fluxo completo de ponta a ponta
+
+**Opção B: Iniciar Fase 2**
+1. Implementar AnalyzeUserPatternsService
+2. Implementar GenerateRecommendationsService
+
+**Opção C: Pular para Frontend (Fase 3)**
+1. Criar dashboard básico
+2. Consumir dados já coletados
+
+---
+
 ## 🏗️ Arquitetura Atual
 
 ### Stack Tecnológica
@@ -453,115 +568,300 @@ Exemplo:
 
 ### 🗺️ Plano de Implementação
 
-#### **Fase 1: Coleta de Dados (1-2 semanas)**
-- [ ] Criar tabela `InterviewAnalytics`
-  - Armazenar métricas por categoria/dificuldade
-  - Score por tipo de pergunta
-  - Tempo de resposta médio
-- [ ] Criar tabela `UserProgress`
-  - Score histórico
-  - Categorias praticadas
-  - Padrões identificados
-- [ ] Criar tabela `UserAchievements`
-  - Badges/conquistas desbloqueadas
-  - Streaks
-  - Nível atual
-- [ ] Serviço de análise pós-entrevista
-  - Extrair métricas do histórico de mensagens
-  - Classificar respostas por qualidade
-  - Salvar em Analytics
+> **🎯 Estratégia**: Arquitetura **genérica e escalável**, mas com **foco 100% em Tech** no lançamento. Isso nos permite:
+> - ✅ Validar product-market fit com devs primeiro
+> - ✅ Expandir para outras áreas SEM refatoração no futuro
+> - ✅ Manter código limpo e reutilizável desde o início
 
-#### **Fase 2: Análise de Padrões (2-3 semanas)**
-- [ ] Criar `AnalyzeUserPatternsService`
-  - Detectar pontos fracos recorrentes
-  - Identificar tópicos problemáticos
-  - Calcular tendências (melhorando/piorando)
-- [ ] Criar `GenerateRecommendationsService`
-  - Gerar recomendações de estudo
-  - Sugerir próximas entrevistas
-  - Criar metas SMART
-- [ ] Criar `CalculateBenchmarksService`
-  - Comparar com outros usuários
-  - Calcular percentis
-  - Identificar outliers
+#### **Fase 1: Coleta de Dados (Backend) - 80% COMPLETO ✅**
+- [x] **Criar tabelas de Analytics (arquitetura genérica)** ✅
+  - [x] `InterviewAnalytics` - métricas gerais da entrevista
+  - [x] `CategoryScore` - scores por categoria (FRONTEND, BACKEND, etc)
+  - [x] `DifficultyScore` - scores por dificuldade (EASY, MEDIUM, HARD)
+  - [x] `UserProgress` - progresso mensal do usuário
+  - [x] `CategoryProgress` - progresso detalhado por categoria
+- [x] **Criar tabelas de Gamificação** ✅
+  - [x] `UserAchievement` - badges/conquistas desbloqueadas
+  - [x] `UserStreak` - streaks de dias consecutivos
+- [x] **Serviço de análise pós-entrevista** ✅ (CRIADO mas NÃO INTEGRADO)
+  - [x] `AnalyzeInterviewService` - extrai métricas do histórico
+  - [x] Calcular scores por categoria (baseado em perguntas usadas)
+  - [x] Calcular scores por dificuldade
+  - [x] Detectar padrões de comunicação (estimativa simples)
+  - [x] Salvar tudo em Analytics
 
-#### **Fase 3: Dashboard UI (2-3 semanas)**
-- [ ] Página de Dashboard
-  - Gráficos de evolução (Chart.js / Recharts)
-  - Cards de métricas principais
-  - Lista de conquistas
-- [ ] Seção de Análise de Padrões
-  - Pontos fortes/fracos
-  - Heatmap de categorias
-  - Timeline de progresso
-- [ ] Seção de Recomendações
-  - Cards de recomendações priorizadas
-  - Links para recursos
-  - Progresso de metas
+**⚠️ PENDENTE (20%):**
+- [ ] **Integração automática**
+  - [ ] Chamar `AnalyzeInterviewService` automaticamente após `CompleteInterviewService`
+  - [ ] Criar endpoints REST (`GET /interviews/:id/analytics`)
+  - [ ] Testar fluxo completo de ponta a ponta
 
-#### **Fase 4: Gamificação (1-2 semanas)**
-- [ ] Sistema de Badges
-  - Definir conquistas
-  - Lógica de desbloqueio
-  - Notificações de conquista
-- [ ] Sistema de Streaks
-  - Rastrear dias consecutivos
-  - Notificações de manutenção de streak
-- [ ] Sistema de Níveis
-  - Progressão baseada em XP
-  - Benefícios por nível
+**📍 Local para integrar:**
+```typescript
+// src/core/modules/interview/useCases/CompleteInterview/CompleteInterviewService.ts
+// Após linha ~90 (depois de interview.complete e update)
 
-#### **Fase 5: Insights de IA (2 semanas)**
-- [ ] Usar IA para análise de texto
-  - Identificar tópicos nas respostas do usuário
-  - Detectar padrões de linguagem
-  - Sugerir melhorias de comunicação
-- [ ] Relatórios mensais automatizados
-  - Email com resumo do mês
-  - Progresso vs metas
-  - Próximos passos
+await this.analyzeInterviewService.execute({
+  interviewId: interview.id.toString()
+});
+```
+
+#### **Fase 2: Análise de Padrões (2-3 semanas) - 0% COMPLETO**
+- [ ] **Criar `AnalyzeUserPatternsService`**
+  - [ ] Buscar todas analytics do usuário
+  - [ ] Agrupar por categoria e calcular médias
+  - [ ] Detectar pontos fracos recorrentes (score < 60 consistente)
+  - [ ] Identificar tópicos problemáticos (tags recorrentes em baixo score)
+  - [ ] Calcular tendências (melhorando/estável/piorando)
+  - [ ] Salvar em `UserProgress`
+
+- [ ] **Criar `GenerateRecommendationsService`**
+  - [ ] Analisar padrões detectados
+  - [ ] Gerar lista de recursos recomendados (hardcoded inicialmente)
+  - [ ] Sugerir próximas entrevistas focadas em fraquezas
+  - [ ] Criar metas SMART automaticamente
+  - [ ] Retornar JSON estruturado para o frontend
+
+- [ ] **Criar `CalculateBenchmarksService`**
+  - [ ] Calcular média global de todos usuários
+  - [ ] Calcular média por nível (Junior/Pleno/Senior)
+  - [ ] Calcular média por categoria
+  - [ ] Calcular percentil do usuário
+  - [ ] Identificar top performers (top 10%, 25%)
+
+**📁 Arquivos a criar:**
+```
+src/core/modules/analytics/useCases/
+├── AnalyzeUserPatterns/
+│   └── AnalyzeUserPatternsService.ts
+├── GenerateRecommendations/
+│   └── GenerateRecommendationsService.ts
+└── CalculateBenchmarks/
+    └── CalculateBenchmarksService.ts
+```
+
+#### **Fase 3: Dashboard UI (2-3 semanas) - 0% COMPLETO**
+
+**Backend REST API:**
+- [ ] **Criar `AnalyticsController`**
+  - [ ] `GET /users/:userId/analytics/summary` - resumo geral
+  - [ ] `GET /users/:userId/analytics/patterns` - padrões detectados
+  - [ ] `GET /users/:userId/analytics/recommendations` - recomendações
+  - [ ] `GET /interviews/:id/analytics` - analytics de entrevista específica
+  - [ ] `GET /users/:userId/progress/history` - histórico mensal
+
+**Frontend (React/Next.js/Vue):**
+- [ ] **Página de Dashboard**
+  - [ ] Layout base com sidebar/header
+  - [ ] Gráficos de evolução de score (Chart.js / Recharts)
+  - [ ] Cards de métricas principais (score médio, total entrevistas, streak)
+  - [ ] Lista de conquistas desbloqueadas
+
+- [ ] **Seção de Análise de Padrões**
+  - [ ] Cards de pontos fortes/fracos
+  - [ ] Heatmap de categorias (visual de quais categorias precisa melhorar)
+  - [ ] Timeline de progresso (scroll horizontal com entrevistas)
+  - [ ] Gráfico de comparação por dificuldade
+
+- [ ] **Seção de Recomendações**
+  - [ ] Cards de recomendações priorizadas (ALTA/MÉDIA/BAIXA)
+  - [ ] Links externos para recursos de estudo
+  - [ ] Progress bars de metas
+  - [ ] Botão "Começar entrevista focada" com categoria pré-selecionada
+
+**📁 Estrutura sugerida:**
+```
+frontend/
+├── pages/
+│   └── dashboard/
+│       ├── index.tsx              # Dashboard principal
+│       ├── patterns.tsx           # Análise de padrões
+│       └── recommendations.tsx    # Recomendações
+├── components/
+│   └── analytics/
+│       ├── ScoreChart.tsx
+│       ├── CategoryHeatmap.tsx
+│       ├── PatternCard.tsx
+│       └── RecommendationCard.tsx
+└── services/
+    └── api/
+        └── analytics.ts           # Chamadas à API
+```
+
+#### **Fase 4: Gamificação (1-2 semanas) - 0% COMPLETO**
+- [ ] **Sistema de Badges**
+  - [ ] Criar enum de conquistas disponíveis
+  - [ ] `UnlockAchievementService` - verifica condições após cada entrevista
+  - [ ] Definir conquistas iniciais:
+    - "Primeira Entrevista" (1 entrevista)
+    - "Em Chamas" (5 entrevistas em 7 dias)
+    - "Evolução" (melhorou 20 pontos em 1 mês)
+    - "Especialista [Categoria]" (5 entrevistas na categoria com 80+)
+    - "Superando Limites" (passou de <60 para 80+ em uma categoria)
+  - [ ] Notificações de conquista (push notification ou toast)
+
+- [ ] **Sistema de Streaks**
+  - [ ] `UpdateStreakService` - executar após cada entrevista
+  - [ ] Verificar se usuário fez entrevista hoje
+  - [ ] Incrementar `currentStreak` se continuou
+  - [ ] Atualizar `longestStreak` se quebrou recorde
+  - [ ] Resetar `currentStreak` se quebrou o streak
+  - [ ] Job diário à meia-noite para resetar streaks quebrados
+
+- [ ] **Sistema de Níveis**
+  - [ ] Definir sistema de XP (ex: 10 XP por entrevista)
+  - [ ] Criar `CalculateUserLevelService`
+  - [ ] Definir benefícios por nível:
+    - Iniciante (0-5): Básico
+    - Intermediário (6-20): +1 entrevista FREE
+    - Avançado (21-50): Badge especial
+    - Expert (51+): Acesso a features beta
+
+**📁 Arquivos a criar:**
+```
+src/core/modules/gamification/
+├── entities/
+│   ├── Achievement.ts
+│   └── UserLevel.ts
+├── useCases/
+│   ├── UnlockAchievement/
+│   │   └── UnlockAchievementService.ts
+│   ├── UpdateStreak/
+│   │   └── UpdateStreakService.ts
+│   └── CalculateLevel/
+│       └── CalculateUserLevelService.ts
+└── constants/
+    └── achievements.ts    # Lista de conquistas disponíveis
+```
+
+#### **Fase 5: Insights de IA (2 semanas) - 0% COMPLETO**
+- [ ] **Análise avançada de texto com IA**
+  - [ ] `AnalyzeResponseQualityService` - usar IA para analisar respostas
+  - [ ] Identificar tópicos específicos mencionados (além de keywords simples)
+  - [ ] Detectar padrões de linguagem:
+    - Muito técnico vs muito genérico
+    - Respostas vagas vs específicas
+    - Uso de jargão apropriado
+    - Estrutura de resposta (STAR method detection)
+  - [ ] Gerar sugestões de melhoria específicas por resposta
+  - [ ] Salvar análise detalhada em `metadata` do analytics
+
+- [ ] **Relatórios mensais automatizados**
+  - [ ] Job/scheduler que roda dia 1º de cada mês
+  - [ ] `GenerateMonthlyReportService` - cria relatório do mês anterior
+  - [ ] Template de email com:
+    - Resumo do progresso (quantas entrevistas, score médio)
+    - Comparação com mês anterior
+    - Conquistas desbloqueadas
+    - Progresso em metas definidas
+    - Próximos passos sugeridos
+  - [ ] Integração com serviço de email (SendGrid/Mailgun)
+  - [ ] Opção de desabilitar relatórios nas configurações do usuário
+
+**🤖 Prompts de IA a criar:**
+```typescript
+// Análise de qualidade de resposta
+const RESPONSE_QUALITY_PROMPT = `
+Analise a seguinte resposta do candidato em uma entrevista técnica:
+
+Pergunta: [question]
+Resposta: [answer]
+
+Forneça análise em JSON:
+{
+  "clarity": 0-100,
+  "depth": 0-100,
+  "specificity": 0-100,
+  "topics": ["topic1", "topic2"],
+  "communicationStyle": "technical|balanced|too-generic",
+  "suggestions": ["sugestão específica 1", "sugestão 2"]
+}
+`;
+```
+
+**📦 Dependências a adicionar:**
+```json
+{
+  "@sendgrid/mail": "^7.x",
+  "node-cron": "^3.x"  // Para jobs agendados
+}
+```
 
 ---
 
 ### 📊 Novos Modelos de Dados
 
+> **🏗️ Arquitetura Genérica**: Os modelos abaixo são projetados para suportar **qualquer categoria profissional** (dev, marketing, design, etc), mas o **foco inicial é 100% em Tech** (Frontend, Backend, DevOps, Cloud, Mobile).
+
 ```prisma
-// Analytics por entrevista
+// Analytics por entrevista (GENÉRICO - funciona para qualquer categoria)
 model InterviewAnalytics {
   id                    String   @id @default(cuid())
   interviewId           String   @unique
 
-  // Scores por categoria
-  frontendScore         Int?
-  backendScore          Int?
-  devopsScore           Int?
-  generalScore          Int?
+  // Score geral (0-100)
+  overallScore          Int
 
-  // Scores por dificuldade
-  easyScore             Int?
-  mediumScore           Int?
-  hardScore             Int?
-
-  // Scores por tipo
-  technicalScore        Int?     // Perguntas técnicas
-  behavioralScore       Int?     // Perguntas comportamentais
+  // Métricas de comunicação
+  communicationQuality  Int?     // 0-100
+  depthOfKnowledge      Int?     // 0-100
+  clarityScore          Int?     // 0-100
 
   // Métricas temporais
   avgResponseTime       Int?     // Segundos
   totalDuration         Int?     // Minutos
+  totalMessages         Int      @default(0)
 
-  // Análise de texto (via IA)
-  communicationQuality  Int?     // 0-100
-  depthOfKnowledge      Int?     // 0-100
+  // Metadata adicional (JSON flexível)
+  metadata              String?  // Ex: { "nervousness": "low", "confidence": "high" }
 
   createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
 
   interview             Interview @relation(fields: [interviewId], references: [id], onDelete: Cascade)
+
+  // 🎯 Relacionamento genérico: scores por categoria
+  categoryScores        CategoryScore[]
+
+  // 🎯 Relacionamento genérico: scores por dificuldade
+  difficultyScores      DifficultyScore[]
 
   @@map("interview_analytics")
 }
 
-// Progresso do usuário ao longo do tempo
+// Scores por categoria (GENÉRICO - escala para qualquer enum)
+model CategoryScore {
+  id          String           @id @default(cuid())
+  analyticsId String
+  category    QuestionCategory // Reutiliza enum existente
+  score       Int              // 0-100
+
+  // Métricas adicionais
+  questionsAnswered Int @default(0)
+  questionsCorrect  Int @default(0)
+
+  analytics   InterviewAnalytics @relation(fields: [analyticsId], references: [id], onDelete: Cascade)
+
+  @@unique([analyticsId, category])
+  @@map("category_scores")
+}
+
+// Scores por dificuldade (GENÉRICO)
+model DifficultyScore {
+  id          String             @id @default(cuid())
+  analyticsId String
+  difficulty  QuestionDifficulty // Reutiliza enum existente
+  score       Int                // 0-100
+
+  questionsAnswered Int @default(0)
+
+  analytics   InterviewAnalytics @relation(fields: [analyticsId], references: [id], onDelete: Cascade)
+
+  @@unique([analyticsId, difficulty])
+  @@map("difficulty_scores")
+}
+
+// Progresso do usuário ao longo do tempo (GENÉRICO)
 model UserProgress {
   id                    String   @id @default(cuid())
   userId                String
@@ -571,14 +871,10 @@ model UserProgress {
   avgScore              Float
   totalInterviews       Int
 
-  // Por categoria
-  frontendCount         Int      @default(0)
-  backendCount          Int      @default(0)
-  devopsCount           Int      @default(0)
-
-  // Padrões identificados (JSON)
-  weaknesses            String   // Array de categorias/tópicos
-  strengths             String   // Array de categorias/tópicos
+  // Padrões identificados (JSON - flexível para qualquer categoria)
+  // Exemplo: { "weaknesses": ["DEVOPS", "CLOUD"], "strengths": ["FRONTEND", "GENERAL"] }
+  weaknesses            String   // JSON array de categorias
+  strengths             String   // JSON array de categorias
 
   // Tendência
   trend                 String   // "improving" | "stable" | "declining"
@@ -588,8 +884,25 @@ model UserProgress {
 
   user                  User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
+  // 🎯 Detalhamento por categoria (genérico)
+  categoryProgress      CategoryProgress[]
+
   @@unique([userId, month])
   @@map("user_progress")
+}
+
+// Progresso detalhado por categoria (GENÉRICO)
+model CategoryProgress {
+  id         String           @id @default(cuid())
+  progressId String
+  category   QuestionCategory
+  count      Int              @default(0)
+  avgScore   Float            @default(0)
+
+  progress   UserProgress @relation(fields: [progressId], references: [id], onDelete: Cascade)
+
+  @@unique([progressId, category])
+  @@map("category_progress")
 }
 
 // Conquistas do usuário
@@ -732,5 +1045,48 @@ O **IA Assistant** evoluiu de um simples chat com IA para um **sistema inteligen
 
 ---
 
+---
+
+## 📋 CHECKLIST DE TAREFAS
+
+### ✅ Completadas (Até 13/10/2024)
+- [x] Arquitetura genérica definida
+- [x] Schema Prisma com analytics atualizado
+- [x] Migrations criadas e aplicadas
+- [x] Entities do domínio (InterviewAnalytics, CategoryScore, DifficultyScore)
+- [x] Repositórios implementados (interface + Prisma)
+- [x] AnalyzeInterviewService criado e funcional
+- [x] Module analytics integrado ao sistema
+- [x] Build compilando sem erros
+
+### 🔄 Em Andamento
+- Nenhuma tarefa em andamento
+
+### ⏳ Próximas Tarefas (Por ordem de prioridade)
+
+**URGENTE (Completar Fase 1):**
+1. [ ] Integrar AnalyzeInterviewService no CompleteInterviewService (~30min)
+2. [ ] Criar AnalyticsController com endpoints REST (~1h)
+3. [ ] Testar fluxo completo de ponta a ponta (~30min)
+
+**CURTO PRAZO (1-2 semanas):**
+4. [ ] Implementar AnalyzeUserPatternsService (Fase 2)
+5. [ ] Implementar GenerateRecommendationsService (Fase 2)
+6. [ ] Implementar CalculateBenchmarksService (Fase 2)
+7. [ ] Criar endpoints REST para Fase 2
+
+**MÉDIO PRAZO (3-4 semanas):**
+8. [ ] Implementar UnlockAchievementService (Fase 4)
+9. [ ] Implementar UpdateStreakService (Fase 4)
+10. [ ] Criar frontend básico do dashboard (Fase 3)
+
+**LONGO PRAZO (5-8 semanas):**
+11. [ ] Análise avançada com IA (Fase 5)
+12. [ ] Relatórios mensais automatizados (Fase 5)
+13. [ ] Dashboard completo com todos gráficos (Fase 3)
+
+---
+
 _Documento criado em: Dezembro 2024_
-_Versão do Sistema: v2.0 (com Banco de Questões Inteligente)_
+_Última atualização: 13/10/2024_
+_Versão do Sistema: v2.1 (Analytics Backend Implementado)_

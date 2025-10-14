@@ -1,3 +1,18 @@
+export interface IInterviewQuestion {
+  id: string;
+  interviewId: string;
+  questionId: string;
+  askedAt: Date;
+  question: {
+    id: string;
+    category: string;
+    level: string;
+    difficulty: string;
+    question: string;
+    tags: string;
+  };
+}
+
 export interface IInterviewQuestionRepository {
   /**
    * Registra uma única pergunta usada em uma entrevista
@@ -13,6 +28,11 @@ export interface IInterviewQuestionRepository {
    * Busca IDs de todas as perguntas usadas em uma entrevista
    */
   findQuestionIdsByInterviewId(interviewId: string): Promise<string[]>;
+
+  /**
+   * Busca todas as perguntas usadas em uma entrevista (com dados completos)
+   */
+  findByInterviewId(interviewId: string): Promise<IInterviewQuestion[]>;
 
   /**
    * Verifica se uma pergunta específica já foi usada em uma entrevista

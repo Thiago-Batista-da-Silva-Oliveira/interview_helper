@@ -7,6 +7,7 @@ import {
 import { APP_GUARD, APP_FILTER, APP_INTERCEPTOR } from '@nestjs/core';
 import { UserModule } from '@modules/user/user.module';
 import { InterviewModule } from '@modules/interview/interview.module';
+import { AnalyticsModule } from '@modules/analytics/analytics.module';
 import { AuthController } from '@infra/http/controllers/auth.controller';
 import { InterviewController } from '@infra/http/controllers/interview.controller';
 import { HealthController } from '@infra/http/controllers/health.controller';
@@ -18,7 +19,7 @@ import { TransformResponseInterceptor } from '@infra/http/interceptors/transform
 import { CheckInterviewOwnerMiddleware } from '@infra/http/middlewares/check-interview-owner.middleware';
 
 @Module({
-  imports: [UserModule, InterviewModule],
+  imports: [UserModule, InterviewModule, AnalyticsModule],
   controllers: [AuthController, InterviewController, HealthController],
   providers: [
     {

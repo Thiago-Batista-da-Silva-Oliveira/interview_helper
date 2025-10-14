@@ -25,10 +25,7 @@ export class QuestionBank extends Entity<IQuestionBankProps> {
     super(props, id);
   }
 
-  static create(
-    data: ICreateQuestionBankDTO,
-    id?: string,
-  ): QuestionBank {
+  static create(data: ICreateQuestionBankDTO, id?: string): QuestionBank {
     const now = new Date();
 
     return new QuestionBank(
@@ -101,9 +98,7 @@ export class QuestionBank extends Entity<IQuestionBankProps> {
   }
 
   hasTag(tag: string): boolean {
-    return this.props.tags.some(
-      (t) => t.toLowerCase() === tag.toLowerCase(),
-    );
+    return this.props.tags.some((t) => t.toLowerCase() === tag.toLowerCase());
   }
 
   matchesCategory(category: QuestionCategory): boolean {

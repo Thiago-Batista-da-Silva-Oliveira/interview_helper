@@ -1,6 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
-import type { IInterviewQuestionRepository } from '@modules/interview/repositories/IInterviewQuestionRepository';
+import type {
+  IInterviewQuestionRepository,
+  IInterviewQuestion,
+} from '@modules/interview/repositories/IInterviewQuestionRepository';
 
 @Injectable()
 export class PrismaInterviewQuestionRepository
@@ -39,6 +42,31 @@ export class PrismaInterviewQuestionRepository
     });
 
     return interviewQuestions.map((iq) => iq.questionId);
+  }
+
+  async findByInterviewId(interviewId: string): Promise<IInterviewQuestion[]> {
+    const interviewQuestions = await this.prisma.interviewQuestion.findMany({
+      where: { interviewId },
+      include: {
+        question: true,
+      },
+      orderBy: { askedAt: 'asc' },
+    });
+
+    return interviewQuestions.map((iq) => ({
+      id: iq.id,
+      interviewId: iq.interviewId,
+      questionId: iq.questionId,
+      askedAt: iq.askedAt,
+      question: {
+        id: iq.question.id,
+        category: iq.question.category,
+        level: iq.question.level,
+        difficulty: iq.question.difficulty,
+        question: iq.question.question,
+        tags: iq.question.tags,
+      },
+    }));
   }
 
   async hasQuestionBeenUsed(

@@ -70,9 +70,7 @@ export class PrismaQuestionBankRepository implements IQuestionBankRepository {
       questions = questions.filter((q) => {
         const questionTags: string[] = JSON.parse(q.tags);
         return criteria.tags!.some((tag) =>
-          questionTags.some(
-            (qt) => qt.toLowerCase() === tag.toLowerCase(),
-          ),
+          questionTags.some((qt) => qt.toLowerCase() === tag.toLowerCase()),
         );
       });
     }
@@ -90,11 +88,7 @@ export class PrismaQuestionBankRepository implements IQuestionBankRepository {
   async findAll(onlyActive: boolean = true): Promise<QuestionBank[]> {
     const questions = await this.prisma.questionBank.findMany({
       where: onlyActive ? { isActive: true } : undefined,
-      orderBy: [
-        { category: 'asc' },
-        { level: 'asc' },
-        { difficulty: 'asc' },
-      ],
+      orderBy: [{ category: 'asc' }, { level: 'asc' }, { difficulty: 'asc' }],
     });
 
     return questions.map((q) => this.toDomain(q));
